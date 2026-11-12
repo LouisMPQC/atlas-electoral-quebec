@@ -1,0 +1,37 @@
+name: Téléchargement des données d'Élections Québec
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.github/workflows/donnees-brutes.yml']
+permissions:
+  contents: write
+jobs:
+  telecharger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Télécharger les fichiers officiels
+        run: |
+          set -e
+          mkdir brut && cd brut
+          B=https://donnees.electionsquebec.qc.ca
+          for y in 2026 2022 2018; do
+            curl -fsSL -o sections_vote_${y}_shapefile.zip $B/autres/provincial/sections_vote_${y}_shapefile.zip
+          done
+          curl -fsSL -o resultats_bv_2026.zip $B/production/provincial/resultats/archives/gen2026-10-05/resultats-bureau-vote.zip
+          curl -fsSL -o resultats_bv_2022.zip $B/production/provincial/resultats/archives/gen2022-10-03/resultats-bureau-vote.zip
+          curl -fsSL -o resultats_bv_2018.zip $B/production/provincial/resultats/archives/gen2018-10-01/resultats-bureau-vote.zip
+          for y in 2026:gen2026-10-05 2022:gen2022-10-03 2018:gen2018-10-01; do
+            a=${y%%:*}; g=${y#*:}
+            for f in resultats.json candidatures.json circonscriptions.csv statistiques.csv electeur_inscrit.csv; do
+              curl -fsSL -o ${a}_$f $B/production/provincial/resultats/archives/$g/$f || echo "absent: $a $f"
+            done
+          done
+          curl -fsSL -o circonscriptions_2026.json $B/autres/provincial/circonscriptions_electorales_sans_eau_2026.json
+          curl -fsSL -o liste_circonscriptions2026.csv $B/autres/provincial/liste_circonscriptions2026.csv
+          ls -la
+      - name: Publier comme version « donnees-brutes »
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete donnees-brutes -y --cleanup-tag -R ${{ github.repository }} || true
+          gh release create donnees-brutes brut/* -R ${{ github.repository }} --title "Données brutes d'Élections Québec" --notes "Copie des fichiers officiels d'Élections Québec (données ouvertes, dgeq.org), téléchargés automatiquement." --prerelease
