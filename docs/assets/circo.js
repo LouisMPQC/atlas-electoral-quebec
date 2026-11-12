@@ -102,7 +102,7 @@ function renderRes(){const c=C(),r=c.res,y=YR[YK];
  $('stack').innerHTML=ps.map(p=>'<i style="width:'+(100*w[p]/O.length)+'%;background:'+PC[p]+'" title="'+PL[p]+' '+w[p]+'"></i>').join('');
  $('wl').innerHTML=PO.filter(p=>p!=='AUT').map(p=>'<span><i style="background:'+PC[p]+'"></i>'+AB[p]+' '+(w[p]||0)+'</span>').join('');}
 /* ---------- carte ---------- */
-const map=L.map('map',{zoomControl:false,minZoom:5,maxZoom:18,attributionControl:true}).setView([46.8,-71.2],11);
+const map=L.map('map',{zoomControl:false,minZoom:5,maxZoom:17,attributionControl:true}).setView([46.8,-71.2],11);
 L.control.zoom({position:'topright'}).addTo(map);
 const ERR='data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 const ESRI='https://server.arcgisonline.com/ArcGIS/rest/services/';
@@ -346,6 +346,6 @@ function inGeom(x,y,g){const ps=g.type==='Polygon'?[g.coordinates]:g.coordinates
 function locate(){const u=new URLSearchParams(location.search),la=parseFloat(u.get('lat')),lo=parseFloat(u.get('lng'));if(isNaN(la)||isNaN(lo))return;
  if(YK!=='y26')setYear('y26');const f=DATA.y26.fc.features.find(f=>inGeom(lo,la,f.geometry));
  L.circleMarker([la,lo],{radius:7,color:'#fff',weight:2,fillColor:'#f2c14e',fillOpacity:1,pane:'bva'}).addTo(map).bindTooltip(u.get('adr')||'Votre adresse',{permanent:true,direction:'right',className:'tip'});
- if(f){goto(f.properties.k);return;}
+ if(f){$('mapcard').scrollIntoView({behavior:'smooth',block:'start'});map.setView([la,lo],16);setTimeout(()=>BYN.y26[f.properties.k].openPopup([la,lo]),700);return;}
  const alt=(u.get('alt')||'').split(',').filter(Boolean);if(alt.length){u.set('alt',alt.slice(1).join(','));location.href='../'+alt[0]+'/?'+u.toString();return;}
  map.setView([la,lo],15);toast('Adresse hors des sections de cette circonscription.');}
