@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/site.css?v=202611121602">
+<link rel="stylesheet" href="assets/site.css?v=202611121638">
 <style>
 .hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px;align-items:end;margin-bottom:22px}
 .hero>*{min-width:0}.hero h1{overflow-wrap:anywhere}
@@ -159,14 +159,14 @@ async function searchAddr(){const q=$('adr').value.trim();if(q.length<4)return;$
  catch(e){$('adrres').innerHTML='<span class="hint">Le service d’adresses ne répond pas. Choisissez plutôt votre région et votre circonscription ci-dessous.</span>';}}
 $('adrgo').onclick=searchAddr;$('adr').onkeydown=e=>{if(e.key==='Enter')searchAddr();};
 document.querySelectorAll('#htabs button').forEach(b=>b.onclick=()=>{HT=b.dataset.t;renderTab();});
-fetch('assets/quebec.json?v=202611121602').then(r=>r.json()).then(d=>{N=d;N.circ.forEach(c=>BYC[c.c]=c);
+fetch('assets/quebec.json?v=202611121638').then(r=>r.json()).then(d=>{N=d;N.circ.forEach(c=>BYC[c.c]=c);
  const rk=Object.keys(N.regions).sort((a,b)=>N.regions[a].localeCompare(N.regions[b],'fr'));
  $('regs').innerHTML='<button data-r="">Tout le Québec<small>'+N.circ.length+'</small></button>'+rk.map(r=>'<button data-r="'+r+'">'+N.regions[r]+'<small>'+N.circ.filter(c=>c.r===r).length+'</small></button>').join('');
  $('rsel').innerHTML='<option value="">Tout le Québec</option>'+rk.map(r=>'<option value="'+r+'">'+N.regions[r]+'</option>').join('');
  document.querySelectorAll('#regs button').forEach(b=>b.onclick=()=>setReg(b.dataset.r));$('rsel').onchange=e=>setReg(e.target.value);
  LAY=L.geoJSON(N.fc,{style,onEachFeature:(f,l)=>{const c=BYC[f.properties.c];l.bindPopup(()=>popup(c),{maxWidth:320});l.bindTooltip(()=>c.n+' · '+AB[win(c.v)]+' · PQ '+f1(pct(c.v,ME))+' %',{sticky:true,className:'tip'});
   l.on('mouseover',e=>{e.target.setStyle({weight:2.2,color:'#fff'});e.target.bringToFront();});l.on('mouseout',e=>LAY.resetStyle(e.target));}}).addTo(map);
- const h=(location.hash.match(/r=(\d+)/)||[])[1];setReg(h&&N.regions[h]?h:'');setTimeout(()=>map.invalidateSize(),200);});
+ const h=(location.hash.match(/r=(\d+)/)||[])[1],r0=h&&N.regions[h]?h:'';setReg(r0);setTimeout(()=>{map.invalidateSize();const b=L.latLngBounds([]);LAY.eachLayer(l=>{if(!r0||BYC[l.feature.properties.c].r===r0)b.extend(l.getBounds());});map.fitBounds(b,{padding:[20,20],maxZoom:11,animate:false});},300);});
 </script>
 </body>
 </html>

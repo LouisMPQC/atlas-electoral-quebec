@@ -166,7 +166,7 @@ fetch('assets/quebec.json?v=__V__').then(r=>r.json()).then(d=>{N=d;N.circ.forEac
  document.querySelectorAll('#regs button').forEach(b=>b.onclick=()=>setReg(b.dataset.r));$('rsel').onchange=e=>setReg(e.target.value);
  LAY=L.geoJSON(N.fc,{style,onEachFeature:(f,l)=>{const c=BYC[f.properties.c];l.bindPopup(()=>popup(c),{maxWidth:320});l.bindTooltip(()=>c.n+' · '+AB[win(c.v)]+' · PQ '+f1(pct(c.v,ME))+' %',{sticky:true,className:'tip'});
   l.on('mouseover',e=>{e.target.setStyle({weight:2.2,color:'#fff'});e.target.bringToFront();});l.on('mouseout',e=>LAY.resetStyle(e.target));}}).addTo(map);
- const h=(location.hash.match(/r=(\d+)/)||[])[1];setReg(h&&N.regions[h]?h:'');setTimeout(()=>map.invalidateSize(),200);});
+ const h=(location.hash.match(/r=(\d+)/)||[])[1],r0=h&&N.regions[h]?h:'';setReg(r0);setTimeout(()=>{map.invalidateSize();const b=L.latLngBounds([]);LAY.eachLayer(l=>{if(!r0||BYC[l.feature.properties.c].r===r0)b.extend(l.getBounds());});map.fitBounds(b,{padding:[20,20],maxZoom:11,animate:false});},300);});
 </script>
 </body>
 </html>
