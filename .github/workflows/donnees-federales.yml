@@ -18,6 +18,13 @@ jobs:
           try pd2021.zip https://ftp.maps.canada.ca/pub/$G/PD_CA_2021_EN.zip https://download-telecharger.services.geo.ca/pub/$G/PD_CA_2021_EN.zip https://ftp.maps.canada.ca/pub/$G/polling_divisions_boundaries_2021.shp.zip
           try res2025.zip https://www.elections.ca/res/rep/off/ovrGE45/62/data_donnees/pollresults_resultatsbureau_canada.zip
           try res2021.zip https://www.elections.ca/res/rep/off/ovr2021app/53/data_donnees/pollresults_resultatsbureau_canada.zip
+          mkdir -p r2025 r2021
+          for n in $(seq 24001 24080); do
+            curl -fsSL -A "Mozilla/5.0" -o r2025/$n.csv https://www.elections.ca/res/rep/off/ovrGE45/62/data_donnees/pollresults_resultatsbureau$n.csv || rm -f r2025/$n.csv
+            curl -fsSL -A "Mozilla/5.0" -o r2021/$n.csv https://www.elections.ca/res/rep/off/ovr2021app/53/data_donnees/pollresults_resultatsbureau$n.csv || rm -f r2021/$n.csv
+          done
+          echo "résultats : $(ls r2025 | wc -l) en 2025, $(ls r2021 | wc -l) en 2021"
+          zip -qr resultats_qc.zip r2025 r2021 && rm -rf r2025 r2021
           for f in *.zip; do echo "== $f"; unzip -l "$f" | head -8; unzip -l "$f" | tail -2; done
           ls -la
       - name: Publier comme version « donnees-federales »
