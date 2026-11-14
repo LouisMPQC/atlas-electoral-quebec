@@ -1,0 +1,28 @@
+name: Téléchargement des données fédérales (Élections Canada)
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.github/workflows/donnees-federales.yml']
+permissions:
+  contents: write
+jobs:
+  telecharger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Télécharger les fichiers officiels
+        run: |
+          mkdir fed && cd fed
+          try() { out=$1; shift; for u in "$@"; do if curl -fsSL -A "Mozilla/5.0" -o "$out" "$u"; then echo "OK $out <- $u"; return 0; fi; echo "échec $u"; done; return 0; }
+          try pd2025.zip https://www.elections.ca/res/cir/mapsCorner/vector/PollingDivisionBoundaries_2025_SHP.zip
+          G=elections_elections/Electoral-districts_Circonscription-electorale/Elections_Canada_2021
+          try pd2021.zip https://ftp.maps.canada.ca/pub/$G/PD_CA_2021_EN.zip https://download-telecharger.services.geo.ca/pub/$G/PD_CA_2021_EN.zip https://ftp.maps.canada.ca/pub/$G/polling_divisions_boundaries_2021.shp.zip
+          try res2025.zip https://www.elections.ca/res/rep/off/ovrGE45/62/data_donnees/pollresults_resultatsbureau_canada.zip
+          try res2021.zip https://www.elections.ca/res/rep/off/ovr2021app/53/data_donnees/pollresults_resultatsbureau_canada.zip
+          for f in *.zip; do echo "== $f"; unzip -l "$f" | head -8; unzip -l "$f" | tail -2; done
+          ls -la
+      - name: Publier comme version « donnees-federales »
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete donnees-federales -y --cleanup-tag -R ${{ github.repository }} || true
+          gh release create donnees-federales fed/* -R ${{ github.repository }} --title "Données fédérales d'Élections Canada" --notes "Copie des fichiers officiels d'Élections Canada (résultats par bureau de vote et limites des sections), 2021 et 2025." --prerelease
