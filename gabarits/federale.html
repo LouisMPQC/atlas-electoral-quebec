@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>__NOM__ · Partielle fédérale · Atlas électoral du Québec</title>
+<meta name="description" content="Résultats fédéraux de 2021 et 2025 par section de vote dans __NOM__, lus du point de vue du Bloc Québécois, en vue de l'élection partielle du 7 décembre 2026.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%233d8fe8'/%3E%3Cpath d='M8 22V10h6a4 4 0 010 8H8' stroke='%23fff' stroke-width='3' fill='none'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/site.css?v=__V__">
+<style>:root{--bq:#3fb6e8}</style>
+</head>
+<body>
+<div class="wrap">
+ <div class="kick" id="kick"></div>
+ <h1>__NOM__</h1>
+ <div class="bar">
+  <div class="seg" id="years"></div>
+  <label class="nav-c">Autres partielles <select id="navc" onchange="if(this.value)location.href='../'+this.value+'/'">__NAV__</select></label>
+  <span class="pill">Élection partielle le 7 décembre 2026 · __BQC__ pour le Bloc</span>
+  <span class="by">Outil conçu par <b>Louis Morin Payette</b></span>
+ </div>
+
+ <section class="card" id="res" aria-label="Résultat de la circonscription">
+  <div><div class="lab" id="resT">Résultat de la circonscription</div><div class="cand" id="cand"></div></div>
+  <div><div class="kpis" id="kpis"></div>
+   <div class="won"><div class="lab">Sections remportées (jour du scrutin)</div><div class="stack" id="stack"></div><div class="wl" id="wl"></div></div></div>
+ </section>
+
+ <section class="card fbar" id="fbar" aria-label="Filtres">
+  <div class="fhead"><div class="lab">Filtrer les bureaux de vote · la carte et les tableaux suivent</div><div class="fsum" id="fsum"></div></div>
+  <div class="fgrid">
+   <label id="lq">Bureau ou secteur<input id="fq" placeholder="ex. 12 ou Saint-Pie" autocomplete="off"></label>
+   <label id="lty">Type de vote<select id="fty"><option value="all">Tous</option><option value="jour">Jour du scrutin</option><option value="anti">Anticipation (BVA)</option><option value="spec">Votes spéciaux</option></select></label>
+   <label id="lsec"><span id="lsecT">Secteur</span><select id="fsec"></select></label>
+   <label id="llead">Parti en tête<select id="flead"></select></label>
+   <label id="ltv">Seuil de %<span class="row"><select id="ftp" aria-label="Parti du seuil"></select><select id="ftop" aria-label="Sens du seuil"><option value="ge">≥</option><option value="le">≤</option></select><input id="ftv" inputmode="decimal" placeholder="%" aria-label="Seuil en pour cent"></span></label>
+   <label>Trier par<span class="row"><select id="fsort"></select><button class="btn" id="fsd" aria-label="Sens du tri">↓</button></span></label>
+  </div>
+  <div class="fact"><button class="btn" id="fzoom">Zoomer sur la sélection</button><button class="btn ghost" id="freset">Réinitialiser</button></div>
+  <div class="rac" id="rac"></div>
+ </section>
+
+ <section class="card" id="mapcard" aria-label="Carte">
+  <div id="side">
+   <div class="lab">Choisir une question</div>
+   <div class="qs" id="qs"></div>
+   <div class="qpick" id="qpick"></div>
+   <div class="lab">Comment lire la carte</div>
+   <div class="leg" id="leg"></div>
+   <div class="take" id="take"></div>
+   <div class="lab" id="listT"></div>
+   <div class="list" id="list"></div>
+  </div>
+  <div id="mapwrap"><div id="map"></div>
+   <div class="mtools">
+    <div class="search"><input id="q" placeholder="Trouver une section (ex. 12)" autocomplete="off" aria-label="Trouver une section"><div class="sug" id="sug"></div></div>
+    <div class="tog"><label><input type="checkbox" id="lbl"> Numéros</label><label><input type="checkbox" id="see"> Mode terrain</label></div>
+   </div>
+  </div>
+ </section>
+
+ <nav class="tabs" id="tabs"><button data-t="tab" class="on">Bureaux de vote</button><button data-t="sec">Secteurs</button><button data-t="tg">À cibler</button><button data-t="rank">Classement par parti</button><button data-t="evo">Évolution depuis 2021</button></nav>
+ <section id="tab"></section>
+
+ <div class="help">
+  <div><b>Une section de vote</b>, c'est un petit morceau de territoire (quelques centaines d'électeurs) qui vote au même bureau. Les limites ont changé en 2023 : les sections de 2021 et de 2025 ne correspondent pas.</div>
+  <div><b>2021.</b> La carte montre les sections de 2021 situées surtout dans les limites actuelles, avec leurs vrais résultats. Le résultat de la circonscription est recalculé sur les limites de 2025 : c'est une estimation, pas un résultat officiel.</div>
+  <div><b>Type de vote.</b> Le vote par anticipation est publié par bureau de vote par anticipation (BVA), qui regroupe plusieurs sections. En mode « Anticipation », chaque section prend la couleur de son BVA. Les votes spéciaux (bulletins spéciaux, électeurs à l'étranger, etc.) n'ont pas de territoire : ils sont seulement dans le tableau.</div>
+  <div><b>Zones hachurées :</b> petites sections (bureaux itinérants, résidences) dont les votes sont comptés avec une autre section. <b>Évolution :</b> les résultats de 2021 sont estimés sur chaque section de 2025 en répartissant les votes des anciennes sections selon la part de leur territoire habité qui s'y trouve.</div>
+ </div>
+ <footer>Données : Élections Canada, résultats officiels par bureau de vote des élections générales de 2021 et 2025 et limites des sections de vote. Secteurs à Montréal : quartiers de référence de la Ville de Montréal (données ouvertes). Les comparaisons entre élections sont des estimations calculées par l'outil, et non des données officielles. Fond de carte : Esri. Outil conçu par <b style="color:var(--ink2)">Louis Morin Payette</b>, avec l'aide de Claude, un modèle d'intelligence artificielle d'Anthropic. <a href="../">Toutes les partielles</a> · <a href="../../">Atlas électoral du Québec</a>.</footer>
+</div>
+<div class="toast" id="toast"></div>
+<script id="data" type="application/json">__DATA__</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="../../assets/circo.js?v=__V__"></script>
+</body>
+</html>

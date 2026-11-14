@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/site.css?v=202611121638">
+<link rel="stylesheet" href="assets/site.css?v=202611141243">
 <style>
 .hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px;align-items:end;margin-bottom:22px}
 .hero>*{min-width:0}.hero h1{overflow-wrap:anywhere}
@@ -38,7 +38,8 @@ td a{color:var(--ink);text-decoration:none}td a:hover{text-decoration:underline}
  <div class="kick">Élections générales québécoises · 2018 · 2022 · 2026</div>
  <div class="hero">
   <div><h1>Atlas électoral du Québec</h1>
-   <p>Les résultats des trois dernières élections générales, région par région, circonscription par circonscription et section de vote par section de vote, lus du point de vue du Parti Québécois. <span class="by">Outil conçu par <b>Louis Morin Payette</b>.</span></p></div>
+   <p>Les résultats des trois dernières élections générales, région par région, circonscription par circonscription et section de vote par section de vote, lus du point de vue du Parti Québécois. <span class="by">Outil conçu par <b>Louis Morin Payette</b>.</span></p>
+   <p><a class="pill" style="text-decoration:none;display:inline-block;margin-top:4px" href="federal/">Nouveau · Partielles fédérales du 7 décembre 2026 (Bloc) →</a></p></div>
   <div class="adr"><div class="lab">Comment a voté votre quartier ?</div>
    <div class="row"><input id="adr" placeholder="Tapez une adresse, ex. 25 rue Wolfe, Lévis" autocomplete="off" aria-label="Adresse"><button class="btn" id="adrgo">Chercher</button></div>
    <div class="res" id="adrres"></div><div class="hint">L’adresse est envoyée au service de géolocalisation du gouvernement du Québec (Adresses Québec) pour être placée sur la carte. Elle n’est pas conservée par cet outil.</div></div>
@@ -159,7 +160,7 @@ async function searchAddr(){const q=$('adr').value.trim();if(q.length<4)return;$
  catch(e){$('adrres').innerHTML='<span class="hint">Le service d’adresses ne répond pas. Choisissez plutôt votre région et votre circonscription ci-dessous.</span>';}}
 $('adrgo').onclick=searchAddr;$('adr').onkeydown=e=>{if(e.key==='Enter')searchAddr();};
 document.querySelectorAll('#htabs button').forEach(b=>b.onclick=()=>{HT=b.dataset.t;renderTab();});
-fetch('assets/quebec.json?v=202611121638').then(r=>r.json()).then(d=>{N=d;N.circ.forEach(c=>BYC[c.c]=c);
+fetch('assets/quebec.json?v=202611141243').then(r=>r.json()).then(d=>{N=d;N.circ.forEach(c=>BYC[c.c]=c);
  const rk=Object.keys(N.regions).sort((a,b)=>N.regions[a].localeCompare(N.regions[b],'fr'));
  $('regs').innerHTML='<button data-r="">Tout le Québec<small>'+N.circ.length+'</small></button>'+rk.map(r=>'<button data-r="'+r+'">'+N.regions[r]+'<small>'+N.circ.filter(c=>c.r===r).length+'</small></button>').join('');
  $('rsel').innerHTML='<option value="">Tout le Québec</option>'+rk.map(r=>'<option value="'+r+'">'+N.regions[r]+'</option>').join('');
