@@ -25,7 +25,8 @@ jobs:
           done
           echo "résultats : $(ls r2025 | wc -l) en 2025, $(ls r2021 | wc -l) en 2021"
           zip -qr resultats_qc.zip r2025 r2021 && rm -rf r2025 r2021
-          u=$(curl -fsSL "https://donnees.montreal.ca/api/3/action/resource_show?id=a80e611f-5336-4306-ba2a-fd657f0f00fa" | python3 -c "import sys,json;print(json.load(sys.stdin)['result']['url'])") && curl -fsSL -o quartiers_montreal.geojson "$u" && echo "OK quartiers" || echo "échec quartiers"
+          curl -sSL -A "Mozilla/5.0" "https://donnees.montreal.ca/api/3/action/package_show?id=quartiers" -o pk.json; head -c 300 pk.json; echo
+          u=$(python3 -c "import json;r=json.load(open('pk.json'))['result']['resources'];print([x['url'] for x in r if 'json' in (x.get('format','')+x['url']).lower()][0])") && echo "url $u" && curl -fsSL -A "Mozilla/5.0" -o quartiers_montreal.geojson "$u" && echo "OK quartiers" || echo "échec quartiers"; rm -f pk.json
           for f in *.zip; do echo "== $f"; unzip -l "$f" | head -8; unzip -l "$f" | tail -2; done
           ls -la
       - name: Publier comme version « donnees-federales »
