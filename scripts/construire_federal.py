@@ -24,7 +24,7 @@ for p in pages:
     bars = ''.join(f'<div class="cr{" me" if q == "BQ" else ""}"><span class="nm">{cfg["pl"][q]}</span><span class="pc">{f1(100*t[q]/tv)} %</span><span class="tr"><i style="width:{100*t[q]/t[order[0]]:.1f}%;background:{cfg["pc"][q]}"></i></span></div>' for q in order if t[q] / tv >= .01)
     cards.append(f'''<a class="card fc" href="{p["slug"]}/"><div class="lab">Candidature du Bloc : {p["bq26"]}</div><h2>{p["nom"]}</h2>
  <div class="kpis"><div class="kpi"><b style="color:var(--bq)">{f1(100*t["BQ"]/tv)} %</b><span>Bloc en 2025 ({rk}<sup>{"er" if rk == 1 else "e"}</sup>)</span></div>
- <div class="kpi"><b>{"+" if gap >= 0 else ""}{f1(gap)} pts</b><span>{"Avance sur le 2e" if w == "BQ" else "Écart avec " + cfg["le"][w].lower()}</span></div>
+ <div class="kpi"><b>{"+" if gap >= 0 else ""}{f1(gap)} pts</b><span>{"Avance sur le 2e" if w == "BQ" else "Écart avec " + cfg["le"][w][0].lower() + cfg["le"][w][1:]}</span></div>
  <div class="kpi"><b>{f1(b21) + " %" if b21 is not None else "—"}</b><span>Bloc en 2021 (sur les limites de 2025)</span></div>
  <div class="kpi"><b>{n0(r["el"])}</b><span>Électeurs inscrits</span></div></div>
  <div class="lab" style="margin-top:14px">Résultat de 2025 · élu : {cl[0][1]} ({cfg["ab"][cl[0][0]]})</div><div class="cand">{bars}</div>
