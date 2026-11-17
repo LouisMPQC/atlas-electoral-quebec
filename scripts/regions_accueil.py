@@ -20,11 +20,7 @@ def stats(circ, me):
         s['n'] += 1; s['me'] += w == me; s['v'] += c['v'][me]; s['t'] += sum(c['v'].values())
     return {k: {'n': v['n'], 'me': v['me'], 'pc': round(100 * v['v'] / v['t'], 1)} for k, v in o.items()}
 out = {'regions': GG['REGIONS'], 'prov': stats(prov['circ'], 'PQ'), 'fed': stats(fed['circ'], 'BQ'),
-       'parts': [{'n': c['n'], 's': c['s'], 'r': c['r'], 'b': c['bq26']} for c in fed['circ'] if c.get('bq26')],
-       'fc': json.loads(r[['reg', 'geometry']].to_json(drop_id=True))}
-for f in out['fc']['features']:
-    def rd(x): return [rd(y) for y in x] if isinstance(x[0], list) else [round(x[0], 4), round(x[1], 4)]
-    f['geometry']['coordinates'] = rd(f['geometry']['coordinates'])
+       'parts': [{'n': c['n'], 's': c['s'], 'r': c['r'], 'b': c['bq26']} for c in fed['circ'] if c.get('bq26')]}
 json.dump(out, open(f'{DOCS}/assets/regions.json', 'w', encoding='utf-8'), separators=(',', ':'), ensure_ascii=False)
 print({k: (v['n'], v['me'], v['pc']) for k, v in sorted(out['prov'].items())})
 print({k: (v['n'], v['me'], v['pc']) for k, v in sorted(out['fed'].items())})

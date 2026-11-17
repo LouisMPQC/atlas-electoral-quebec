@@ -6,124 +6,119 @@
 <title>Atlas électoral du Québec</title>
 <meta name="description" content="Les résultats électoraux du Québec, provincial et fédéral, région par région, circonscription par circonscription et section de vote par section de vote.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%233d8fe8'/%3E%3Cpath d='M8 22V10h6a4 4 0 010 8H8' stroke='%23fff' stroke-width='3' fill='none'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/site.css?v=__V__">
 <style>
-:root{--pq:#3d8fe8;--bloc:#3fb6e8}
-.top{display:flex;flex-wrap:wrap;gap:18px 30px;align-items:end;justify-content:space-between;margin-bottom:18px}
-.top>div{min-width:0}.top h1{overflow-wrap:anywhere}
-.top p{color:var(--ink2);max-width:60ch;font-size:.95rem;margin-top:6px}
-.sw{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
-.sw button{border:0;background:none;color:var(--ink2);border-radius:9px;padding:10px 18px;font:700 1.15rem/1 var(--hd);letter-spacing:.02em;cursor:pointer;text-align:left}
-.sw button small{display:block;font:500 .7rem var(--mono);letter-spacing:0;margin-top:4px;opacity:.8}
-.sw button.on{background:var(--acc);color:#06121c}
-.om{display:grid;grid-template-columns:minmax(0,1fr) 330px;overflow:hidden;min-height:620px}
-#omap{min-height:620px;background:#0b0f14}
-#oside{border-left:1px solid var(--line);padding:16px 18px;display:flex;flex-direction:column;gap:6px;overflow:auto;max-height:620px}
-.rl{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:4px 12px;align-items:center;text-decoration:none;color:var(--ink);padding:7px 8px;border-radius:8px;font:500 .88rem var(--body)}
-.rl:hover,.rl.hv{background:var(--panel2)}
-.rl i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:8px;vertical-align:-1px}
-.rl .s{font:500 .75rem var(--mono);color:var(--ink2);text-align:right}
-.rl .p{font:600 .8rem var(--mono);text-align:right;min-width:46px}
-.rl.off{opacity:.45}
-.oh{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;font:500 .68rem var(--mono);color:var(--ink3);padding:0 8px 4px;text-transform:uppercase;letter-spacing:.06em}
-.lg{display:flex;align-items:center;gap:8px;font:500 .72rem var(--mono);color:var(--ink2);margin-bottom:6px}.lg span.b{flex:1;height:9px;border-radius:5px}
-.go2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:18px}
-a.big{display:block;padding:18px 20px;text-decoration:none;color:var(--ink);transition:border-color .15s}
-a.big:hover{border-color:var(--acc2)}
-a.big h2{font:700 1.7rem/1.05 var(--hd);margin:4px 0 8px}a.big p{color:var(--ink2);font-size:.9rem}
-a.big .arr{display:inline-block;margin-top:10px;border-radius:7px;padding:6px 11px;font:600 .82rem var(--body);color:#06121c}
+:root{--pq:#3d8fe8;--bloc:#3fb6e8;--acc:#3d8fe8}
+.head{padding:8px 0 26px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.head h1{overflow-wrap:anywhere}
+.head p{color:var(--ink2);max-width:62ch;font-size:.97rem;margin-top:8px}
+.doors{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.door{position:relative;display:block;text-align:left;cursor:pointer;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px 26px 22px;color:var(--ink);font:inherit;transition:border-color .15s,transform .15s,background .15s;overflow:hidden}
+.door::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--c)}
+.door:hover{border-color:var(--c);transform:translateY(-1px)}
+.door.on{border-color:var(--c);background:linear-gradient(135deg,color-mix(in srgb,var(--c) 14%,var(--panel)),var(--panel) 70%)}
+.door .lab{color:var(--c)}
+.door h2{font:700 2.3rem/1 var(--hd);margin:6px 0 10px}
+.door p{color:var(--ink2);font-size:.9rem;max-width:44ch}
+.door .meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:14px;font:500 .78rem var(--mono);color:var(--ink2)}
+.door .meta b{color:var(--ink);font-weight:600}
+.door .cta{display:inline-block;margin-top:16px;font:600 .85rem var(--body);color:var(--c)}
+#step{margin-top:30px}
+.sh{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:baseline;justify-content:space-between;margin-bottom:14px}
+.sh h3{font:700 1.6rem/1.1 var(--hd)}
+.sh a{font:600 .85rem var(--body);color:var(--acc);text-decoration:none}.sh a:hover{text-decoration:underline}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+a.reg{display:flex;flex-direction:column;gap:10px;text-decoration:none;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:15px 16px 14px;transition:border-color .15s,background .15s}
+a.reg:hover{border-color:var(--acc);background:var(--panel2)}
+a.reg .t{min-height:1.25em}
+a.reg .n{font:600 1rem/1.25 var(--body)}
+a.reg .no{font:500 .68rem var(--mono);color:var(--ink3);white-space:nowrap;padding-top:3px}
+a.reg .k{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;font:500 .74rem var(--mono);color:var(--ink2)}
+a.reg .k b{font:700 1.35rem/1 var(--hd);color:var(--ink);display:block;margin-bottom:4px}a.reg .k small{font:600 .9rem var(--hd);color:var(--ink2)}
+a.reg .bar{margin-top:auto}
+a.reg .bar{height:6px;border-radius:4px;background:var(--panel2);overflow:hidden}
+a.reg .bar i{display:block;height:100%;background:var(--acc);border-radius:4px}
+a.reg.off{opacity:.6}
+a.reg .note{font-size:.76rem;color:var(--ink3)}
+.all{display:flex;align-items:center;justify-content:center;border-style:dashed}
+.all span{font:600 .9rem var(--body);color:var(--acc)}
 .parts{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .parts a{text-decoration:none;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 11px;font:500 .85rem var(--body)}.parts a:hover{border-color:var(--bloc)}
-.leaflet-tooltip.rt{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;font:500 .82rem var(--body);box-shadow:0 6px 20px rgba(0,0,0,.4)}
-.leaflet-tooltip.rt b{font:700 1rem var(--hd)}
-@media (max-width:860px){.om{grid-template-columns:1fr}#omap{min-height:52vh}#oside{border-left:0;border-top:1px solid var(--line);max-height:none}.sw{width:100%}.sw button{flex:1}}
+.hint{color:var(--ink3);font-size:.86rem;margin-top:22px;text-align:center}
+@media (max-width:700px){.doors{grid-template-columns:1fr}.door{padding:18px 20px}.door h2{font-size:1.9rem}.grid{grid-template-columns:1fr 1fr}a.reg{padding:12px}}
+@media (max-width:380px){.grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<div class="wrap" id="root">
- <div class="kick">Résultats électoraux · provincial et fédéral</div>
- <div class="top">
-  <div><h1>Atlas électoral du Québec</h1>
-   <p>Les résultats des élections au Québec, région par région, circonscription par circonscription et section de vote par section de vote. Choisissez le palier, puis une région sur la carte. <span class="by">Outil conçu par <b>Louis Morin Payette</b>.</span></p></div>
-  <div class="sw" role="tablist" aria-label="Palier">
-   <button role="tab" data-n="prov">Provincial<small>PQ · 2018, 2022, 2026</small></button>
-   <button role="tab" data-n="fed">Fédéral<small>Bloc · 2021, 2025</small></button>
-  </div>
+<div class="wrap">
+ <header class="head">
+  <div class="kick">Résultats électoraux · provincial et fédéral</div>
+  <h1>Atlas électoral du Québec</h1>
+  <p>Les résultats des élections au Québec, région par région, circonscription par circonscription et section de vote par section de vote. Choisissez d’abord le palier, puis la région. <span class="by">Outil conçu par <b>Louis Morin Payette</b>.</span></p>
+ </header>
+
+ <div class="doors" role="tablist" aria-label="Palier">
+  <button class="door" role="tab" data-n="fed" style="--c:var(--bloc)">
+   <div class="lab">Palier fédéral</div><h2>Fédéral</h2>
+   <p>Les 78 circonscriptions fédérales du Québec, lues du point de vue du Bloc Québécois.</p>
+   <div class="meta"><span>Élections <b>2021</b> et <b>2025</b></span><span id="mfed"></span></div>
+   <span class="cta">Choisir une région →</span>
+  </button>
+  <button class="door" role="tab" data-n="prov" style="--c:var(--pq)">
+   <div class="lab">Palier provincial</div><h2>Provincial</h2>
+   <p>Les 127 circonscriptions provinciales du Québec, lues du point de vue du Parti Québécois.</p>
+   <div class="meta"><span>Élections <b>2018</b>, <b>2022</b> et <b>2026</b></span><span id="mprov"></span></div>
+   <span class="cta">Choisir une région →</span>
+  </button>
  </div>
 
- <section class="card om" aria-label="Carte des régions">
-  <div id="omap"></div>
-  <div id="oside">
-   <div class="lab" id="olab"></div>
-   <div class="lg" id="olg"></div>
-   <div class="oh"><span>Région</span><span id="ohs"></span><span id="ohp"></span></div>
-   <div id="olist"></div>
-  </div>
+ <section id="step" hidden>
+  <div class="sh"><h3 id="sht"></h3><a id="sha" href="#"></a></div>
+  <div class="grid" id="grid"></div>
  </section>
+ <p class="hint" id="hint">Choisissez un palier pour afficher les 17 régions administratives.</p>
 
- <div class="go2">
-  <a class="card big" href="provincial/"><div class="lab">Provincial</div><h2>Le Québec au provincial</h2><p>127 circonscriptions, élections générales de 2018, 2022 et 2026, lues du point de vue du Parti Québécois.</p><span class="arr" style="background:var(--pq)">Tout le Québec →</span></a>
-  <a class="card big" href="federal/"><div class="lab">Fédéral</div><h2>Le Québec au fédéral</h2><p>78 circonscriptions, élections générales de 2021 et 2025, lues du point de vue du Bloc Québécois.</p><span class="arr" style="background:var(--bloc)">Tout le Québec →</span></a>
- </div>
-
- <section class="card" style="padding:16px 20px;margin-top:18px;border-color:rgba(242,193,78,.35)">
+ <section class="card" style="padding:16px 20px;margin-top:28px;border-color:rgba(242,193,78,.35)">
   <div class="lab" style="color:var(--warn)">Élections partielles fédérales le 7 décembre 2026</div>
   <div class="parts" id="parts"></div>
  </section>
 
- <footer>Données : Élections Québec et Élections Canada, résultats officiels par bureau de vote et limites des sections de vote. Les comparaisons entre élections sont des estimations calculées par l’outil, et non des données officielles. Fond de carte : Esri. Outil conçu par <b style="color:var(--ink2)">Louis Morin Payette</b>, avec l’aide de Claude, un modèle d’intelligence artificielle d’Anthropic.</footer>
+ <footer>Données : Élections Québec et Élections Canada, résultats officiels par bureau de vote et limites des sections de vote. Les comparaisons entre élections sont des estimations calculées par l’outil, et non des données officielles. Outil conçu par <b style="color:var(--ink2)">Louis Morin Payette</b>, avec l’aide de Claude, un modèle d’intelligence artificielle d’Anthropic.</footer>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 (function(){const h=(location.hash.match(/r=(\d+)/)||[])[1];if(h)location.replace('provincial/#r='+h);})();
 const $=id=>document.getElementById(id);
 const f1=x=>x.toFixed(1).replace('.',',');
-const CFG={prov:{t:'Provincial',c:'#3d8fe8',me:'PQ',st:'prov',yr:'2026',seat:'Sièges PQ',path:'provincial/'},
-           fed:{t:'Fédéral',c:'#3fb6e8',me:'Bloc',st:'fed',yr:'2025',seat:'Sièges Bloc',path:'federal/'}};
-function hex(c){return [1,3,5].map(i=>parseInt(c.slice(i,i+2),16));}
-function mix(a,b,t){const A=hex(a),B=hex(b);return '#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join('');}
-const LO=10,HI=50;
-function col(c,p){const t=Math.max(0,Math.min(1,(p-LO)/(HI-LO)));return t<.6?mix('#16202b',c,t/.6):mix(c,'#ffffff',(t-.6)/.4*.5);}
-let N,MODE='prov',LAY,HOV=null;
-try{const m=localStorage.getItem('atlas-palier');if(m==='fed'||m==='prov')MODE=m;}catch(e){}
-const q=new URLSearchParams(location.search).get('palier');if(q==='fed'||q==='prov')MODE=q;
-const map=L.map('omap',{zoomControl:false,minZoom:4,maxZoom:9,zoomSnap:.25}).setView([50,-71],5);
-L.control.zoom({position:'topright'}).addTo(map);
-L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{maxNativeZoom:16,attribution:'Fond : Esri · Données : Élections Québec, Élections Canada'}).addTo(map);
-// Nord-du-Québec n'a pas de circonscription fédérale propre : on renvoie vers la région qui le couvre.
-const FEDR=r=>r==='10'?'08':r;
-function st(r){const c=CFG[MODE],S=N[c.st];return S[MODE==='fed'?FEDR(r):r];}
-function href(r){return CFG[MODE].path+'#r='+(MODE==='fed'?FEDR(r):r);}
-function tip(r){const c=CFG[MODE],s=st(r);let h='<b>'+N.regions[r]+'</b><br>';
- if(MODE==='fed'&&r==='10')h+='<span style="color:var(--ink2)">Couvert par Abitibi–Baie-James–Nunavik–Eeyou (région Abitibi-Témiscamingue)</span><br>';
- return h+c.me+' '+c.yr+' : <b>'+f1(s.pc)+' %</b> · '+c.seat+' : '+s.me+' sur '+s.n;}
-function render(){
- const c=CFG[MODE];
- document.documentElement.style.setProperty('--acc',c.c);document.documentElement.style.setProperty('--acc2',c.c);
- document.querySelectorAll('.sw button').forEach(b=>{b.classList.toggle('on',b.dataset.n===MODE);b.setAttribute('aria-selected',b.dataset.n===MODE);});
- try{localStorage.setItem('atlas-palier',MODE);}catch(e){}
- $('olab').textContent=c.t+' · vote '+c.me+' en '+c.yr+' par région';
- $('olg').innerHTML='<span>'+LO+' %</span><span class="b" style="background:linear-gradient(90deg,'+[0,.25,.5,.75,1].map(t=>col(c.c,LO+t*(HI-LO))).join(',')+')"></span><span>'+HI+' % et +</span>';
- $('ohs').textContent=c.seat;$('ohp').textContent=c.me+' '+c.yr;
+const CFG={prov:{t:'Provincial',c:'#3d8fe8',me:'PQ',yr:'2026',seat:'sièges PQ',path:'provincial/',nc:127},
+           fed:{t:'Fédéral',c:'#3fb6e8',me:'Bloc',yr:'2025',seat:'sièges Bloc',path:'federal/',nc:78}};
+let N,MODE=null;
+const FEDR=r=>r==='10'?'08':r; // Nord-du-Québec : couvert par Abitibi–Baie-James–Nunavik–Eeyou
+function show(m,scroll){
+ MODE=m;const c=CFG[m],S=N[m];
+ document.documentElement.style.setProperty('--acc',c.c);
+ document.querySelectorAll('.door').forEach(b=>{b.classList.toggle('on',b.dataset.n===m);b.setAttribute('aria-selected',b.dataset.n===m);});
+ history.replaceState(null,'',location.pathname+'#'+m);
+ $('step').hidden=false;$('hint').hidden=true;
+ $('sht').textContent=c.t+' · les 17 régions';
+ $('sha').href=c.path;$('sha').textContent='Tout le Québec ('+c.nc+' circonscriptions) →';
  const rs=Object.keys(N.regions).sort((a,b)=>N.regions[a].localeCompare(N.regions[b],'fr'));
- $('olist').innerHTML=rs.map(r=>{const s=st(r),nr=MODE==='fed'&&r==='10';return '<a class="rl'+(nr?' off':'')+'" data-r="'+r+'" href="'+href(r)+'"><span><i style="background:'+col(c.c,s.pc)+'"></i>'+N.regions[r]+'</span><span class="s">'+(nr?'voir Abitibi':s.me+' / '+s.n)+'</span><span class="p">'+f1(s.pc)+' %</span></a>';}).join('');
- $('olist').querySelectorAll('.rl').forEach(a=>{a.onmouseenter=()=>hl(a.dataset.r,true);a.onmouseleave=()=>hl(a.dataset.r,false);});
- LAY.eachLayer(l=>{const r=l.feature.properties.reg;l.setStyle(sty(r));l.setTooltipContent(tip(r));});
+ $('grid').innerHTML=rs.map(r=>{
+  const nord=m==='fed'&&r==='10',s=S[m==='fed'?FEDR(r):r];
+  if(nord)return '<a class="reg off" href="'+c.path+'#r=08"><div class="t"><span class="n">'+N.regions[r]+'</span></div><div class="note">Pas de circonscription fédérale propre : le territoire fait partie d’Abitibi–Baie-James–Nunavik–Eeyou, rattachée à l’Abitibi-Témiscamingue.</div></a>';
+  return '<a class="reg" href="'+c.path+'#r='+r+'"><div class="t"><span class="n">'+N.regions[r]+'</span></div>'+
+   '<div class="k"><span><b>'+s.me+' <small>/ '+s.n+'</small></b>'+c.seat+'</span><span style="text-align:right"><b>'+f1(s.pc)+' %</b>'+c.me+' en '+c.yr+'</span></div>'+
+   '<div class="bar" title="'+c.me+' '+c.yr+' : '+f1(s.pc)+' %"><i style="width:'+Math.min(100,s.pc*2)+'%"></i></div></a>';}).join('')+
+  '<a class="reg all" href="'+c.path+'"><span>Tout le Québec →</span></a>';
+ if(scroll)$('step').scrollIntoView({behavior:'smooth',block:'start'});
 }
-function sty(r,on){return {color:on?'#ffffff':'#0b0f14',weight:on?2.5:1,fillColor:col(CFG[MODE].c,st(r).pc),fillOpacity:on?.95:.82};}
-function hl(r,on){LAY.eachLayer(l=>{if(l.feature.properties.reg===r){l.setStyle(sty(r,on));if(on)l.bringToFront();}});
- document.querySelectorAll('.rl').forEach(a=>a.classList.toggle('hv',on&&a.dataset.r===r));}
-document.querySelectorAll('.sw button').forEach(b=>b.onclick=()=>{MODE=b.dataset.n;render();});
+document.querySelectorAll('.door').forEach(b=>b.onclick=()=>show(b.dataset.n,true));
 fetch('assets/regions.json?v=__V__').then(r=>r.json()).then(d=>{N=d;
- LAY=L.geoJSON(N.fc,{style:f=>sty(f.properties.reg),onEachFeature:(f,l)=>{const r=f.properties.reg;
-  l.bindTooltip('',{sticky:true,className:'rt'});
-  l.on('mouseover',()=>hl(r,true));l.on('mouseout',()=>hl(r,false));l.on('click',()=>{location.href=href(r);});}}).addTo(map);
- map.fitBounds(LAY.getBounds(),{padding:[10,10]});
+ const tot=k=>Object.values(N[k]).reduce((a,s)=>a+s.me,0);
+ $('mfed').innerHTML='<b>'+tot('fed')+'</b> sièges Bloc en 2025';$('mprov').innerHTML='<b>'+tot('prov')+'</b> sièges PQ en 2026';
  $('parts').innerHTML=N.parts.map(p=>'<a href="federal/'+p.s+'/"><b>'+p.n+'</b> · '+p.b+' pour le Bloc</a>').join('');
- render();
+ const h=location.hash.slice(1);if(h==='fed'||h==='prov')show(h,false);
 });
 </script>
 </body>
