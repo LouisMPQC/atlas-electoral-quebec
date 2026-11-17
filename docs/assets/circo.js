@@ -80,12 +80,13 @@ function prepQ(){const D=R(),O=ORDall();
  QUES.me.bins=quint(O.map(k=>pct(D[k],ME)),ramp(PC[ME]),x=>x+' %');
  QUES.par.bins=quint(O.map(k=>pct(D[k],PP)),ramp(PC[PP]),x=>x+' %');
  QUES.part.bins=quint(O.map(partK),ramp('#d9b44a'),x=>x+' %');}
-function fillR(k){const d=R()[k];if(Q==='win')return PC[win(d)];if(!QUES[Q].bins)return '#2a313c';const v=val(k);return v==null?'#2a313c':binOf(QUES[Q],v)[1];}
+function fillR(k){const d=R()[k];if(Q==='win'){const w=win(d),m=pct(d,w)-pct(d,second(d));return mix(PC[w],'#0b0d12',Math.max(0,Math.min(.6,(15-m)/15*.6)));}if(!QUES[Q].bins)return '#2a313c';const v=val(k);return v==null?'#2a313c':binOf(QUES[Q],v)[1];}
 function style(f){const k=f.properties.k,d=R()[k];
- if(fActive()&&!match(k))return{color:'#3a4556',weight:.6,dashArray:null,fillColor:'#151b24',fillOpacity:SEE?.08:.3,opacity:.45};
- if(isReg(d))return{color:'#8793a3',weight:SEE?1.2:.9,dashArray:'3 3',fillColor:'#232a35',fillOpacity:SEE?.15:.55,opacity:.8};
- if(FILT.ty==='anti')return{color:'#e3eaf2',weight:.5,dashArray:null,fillColor:fillR(k),fillOpacity:SEE?.3:.72,opacity:.18};
- return{color:SEE?'#ffffff':'#e3eaf2',weight:SEE?1.8:1,dashArray:null,fillColor:fillR(k),fillOpacity:SEE?.28:.7,opacity:SEE?.95:.55};}
+ const lo=SEE||SAT;
+ if(fActive()&&!match(k))return{color:'#0b0d12',weight:.6,dashArray:null,fillColor:'#151b24',fillOpacity:lo?.06:.35,opacity:.6};
+ if(isReg(d))return{color:lo?'#ffffff':'#0b0d12',weight:lo?1:.7,dashArray:null,fillColor:'#2b313c',fillOpacity:lo?.12:.75,opacity:lo?.5:.9};
+ if(FILT.ty==='anti')return{color:'#0b0d12',weight:.5,dashArray:null,fillColor:fillR(k),fillOpacity:lo?.32:.82,opacity:.6};
+ return{color:lo?'#ffffff':'#0b0d12',weight:lo?1.4:.8,dashArray:null,fillColor:fillR(k),fillOpacity:lo?.32:.84,opacity:lo?.85:.9};}
 /* ---------- panneau de résultats ---------- */
 function renderRes(){const c=C(),r=c.res,y=YR[YK];
  $('kick').innerHTML=DATA.crumb?DATA.crumb+' › '+y.t:'<a href="../../">Atlas électoral du Québec</a> › <a href="../../provincial/#r='+DATA.reg+'">Provincial · '+DATA.regn+'</a> › '+y.t;
@@ -111,15 +112,17 @@ const map=L.map('map',{zoomControl:false,minZoom:5,maxZoom:17,attributionControl
 L.control.zoom({position:'topright'}).addTo(map);
 const ERR='data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 const ESRI='https://server.arcgisonline.com/ArcGIS/rest/services/';
-L.tileLayer(ESRI+'Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{maxNativeZoom:16,maxZoom:19,errorTileUrl:ERR,attribution:'Fond : Esri · Données : '+CFG.org}).addTo(map);
+const CARTO='https://{s}.basemaps.cartocdn.com/';
+const BASE_PLAN=L.tileLayer(CARTO+'dark_nolabels/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19,errorTileUrl:ERR,attribution:'Fond : © OpenStreetMap · © CARTO · Données : '+CFG.org}).addTo(map);
+const BASE_SAT=L.tileLayer(ESRI+'World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxNativeZoom:18,maxZoom:19,errorTileUrl:ERR,attribution:'Imagerie : Esri · Données : '+CFG.org});
+let SAT=false;
 map.createPane('mask');map.getPane('mask').style.zIndex=340;map.getPane('mask').style.pointerEvents='none';
 map.createPane('roads');map.getPane('roads').style.zIndex=420;map.getPane('roads').style.pointerEvents='none';
 map.createPane('labels');map.getPane('labels').style.zIndex=450;map.getPane('labels').style.pointerEvents='none';
-const ROADS=L.tileLayer(ESRI+'Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}',{pane:'roads',maxNativeZoom:19,maxZoom:19,errorTileUrl:ERR,opacity:.5}).addTo(map);
-L.tileLayer(ESRI+'Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',{pane:'labels',maxNativeZoom:16,maxZoom:19,errorTileUrl:ERR}).addTo(map);
+L.tileLayer(CARTO+'dark_only_labels/{z}/{x}/{y}{r}.png',{pane:'labels',subdomains:'abcd',maxZoom:19,errorTileUrl:ERR,opacity:.9}).addTo(map);
 const WORLD=[[70,-100],[70,-40],[35,-40],[35,-100]],MASK={};
-YKS.forEach(yk=>{if(DATA[yk].m&&DATA[yk].m.length)MASK[yk]=L.polygon([WORLD,...DATA[yk].m],{pane:'mask',interactive:false,stroke:false,fillColor:'#0b0f14',fillOpacity:.9});});
-function maskLayer(){YKS.forEach(yk=>{if(!MASK[yk])return;yk===YK?map.addLayer(MASK[yk]):map.removeLayer(MASK[yk]);});ROADS.setOpacity(SEE?.85:.5);}
+YKS.forEach(yk=>{if(DATA[yk].m&&DATA[yk].m.length)MASK[yk]=L.layerGroup([L.polygon([WORLD,...DATA[yk].m],{pane:'mask',interactive:false,stroke:false,fillColor:'#0b0d12',fillOpacity:.72}),L.polygon(DATA[yk].m,{pane:'roads',interactive:false,fill:false,color:'#ffffff',weight:2.2,opacity:.85})]);});
+function maskLayer(){YKS.forEach(yk=>{if(!MASK[yk])return;yk===YK?map.addLayer(MASK[yk]):map.removeLayer(MASK[yk]);});}
 function sentence(d,k){
  if(isReg(d))return 'Petite section (souvent une résidence ou un immeuble). Ses votes ont été comptés avec la <b>section '+(d&&d.regr?lab(d.regr):'voisine')+'</b>.';
  const rank=1+PO.filter(x=>x!=='AUT'&&(d[x]||0)>(d[ME]||0)).length,w=win(d);
@@ -153,7 +156,7 @@ const LAY={},BYN={},FEAT={};
 YKS.forEach(yk=>{BYN[yk]={};FEAT[yk]={};LAY[yk]=L.geoJSON(DATA[yk].fc,{style,onEachFeature:(f,l)=>{BYN[yk][f.properties.k]=l;FEAT[yk][f.properties.k]=f.properties;
  l.bindPopup(()=>popup(f.properties),{maxWidth:320,autoPanPaddingTopLeft:L.point(12,innerWidth<860?48:70),autoPanPaddingBottomRight:L.point(12,70)});
  l.bindTooltip(()=>tipTxt(f.properties),{sticky:true,className:'tip',direction:'top',offset:[0,-8]});
- l.on('mouseover',e=>{e.target.setStyle({weight:2.4,color:'#ffffff'});e.target.bringToFront();});
+ l.on('mouseover',e=>{e.target.setStyle({weight:2.6,color:'#ffffff',opacity:1});e.target.bringToFront();});
  l.on('mouseout',e=>{LAY[YK].resetStyle(e.target);});}});});
 const fit=()=>{try{map.fitBounds(LAY[YK].getBounds(),{padding:[20,20]});}catch(e){}};
 function ORDall(){return Object.keys(R()).filter(k=>!isReg(R()[k])&&BYN[YK][k]);}
@@ -167,7 +170,7 @@ function renderSide(){const c=C(),O=ORD(),Rr=R();const qs=Object.keys(QUES).filt
  document.querySelectorAll('#qpick button').forEach(b=>b.onclick=()=>{if(b.dataset.e)EV=b.dataset.e;else if(pk==='vs')VP=b.dataset.p;else PP=b.dataset.p;prepQ();LAY[YK].setStyle(style);renderSide();});
  document.querySelectorAll('.qb').forEach(b=>b.onclick=()=>{Q=b.dataset.q;prepQ();LAY[YK].setStyle(style);renderSide();});
  let lg='';
- if(Q==='win'){const n={};O.forEach(k=>{const w=win(Rr[k]);n[w]=(n[w]||0)+1;});PO.filter(p=>n[p]).sort((a,b)=>n[b]-n[a]).forEach(p=>lg+=legRow(PC[p],PL[p],'',n[p]));}
+ if(Q==='win'){const n={};O.forEach(k=>{const w=win(Rr[k]);n[w]=(n[w]||0)+1;});PO.filter(p=>n[p]).sort((a,b)=>n[b]-n[a]).forEach(p=>lg+=legRow(PC[p],PL[p],'',n[p]));lg+='<div class="lnote">Couleur pleine : avance nette (15 points et plus). Couleur sombre : course serrée.</div>';}
  else{const Qd=QUES[Q],n=Qd.bins.map(()=>0);let nn=0;O.forEach(k=>{const v=val(k);if(v==null)nn++;else n[Qd.bins.indexOf(binOf(Qd,v))]++;});Qd.bins.forEach((b,i)=>lg+=legRow(b[1],b[2],b[3],n[i]));if(nn)lg+=legRow('#2a313c','Pas de comparaison','',nn);}
  const nreg=Object.keys(Rr).filter(k=>isReg(Rr[k])&&BYN[YK][k]).length;if(nreg)lg+='<div class="lr reg"><i></i><span><b>Comptées avec une voisine</b></span><span class="n">'+nreg+' sect.</span></div>';
  $('leg').innerHTML=lg;
@@ -382,3 +385,12 @@ const GPSB=L.DomUtil.create('div','leaflet-bar gpsb');
  L.DomEvent.disableClickPropagation(GPSB);GPSB.firstChild.onclick=e=>{e.preventDefault();GW==null?gpsStart():gpsStop();};return GPSB;}});new C().addTo(map);})();
 (function(){const s=new URLSearchParams(location.search).get('s');if(s&&BYN[CUR]&&BYN[CUR][s])setTimeout(()=>{if(YK!==CUR)setYear(CUR);goto(s);},500);})();
 map.on('popupopen',()=>$('mapwrap').classList.add('pop'));map.on('popupclose',()=>$('mapwrap').classList.remove('pop'));
+
+/* ---------- fond : plan ou satellite ---------- */
+(function(){const C=L.Control.extend({options:{position:'topright'},onAdd(){const d=L.DomUtil.create('div','leaflet-bar basesw');
+ d.innerHTML='<a href="#" data-b="plan" class="on" title="Plan">Plan</a><a href="#" data-b="sat" title="Photo aérienne">Satellite</a>';
+ L.DomEvent.disableClickPropagation(d);d.querySelectorAll('a').forEach(a=>a.onclick=e=>{e.preventDefault();const sat=a.dataset.b==='sat';if(sat===SAT)return;SAT=sat;
+  if(SAT){map.removeLayer(BASE_PLAN);BASE_SAT.addTo(map);}else{map.removeLayer(BASE_SAT);BASE_PLAN.addTo(map);}
+  d.querySelectorAll('a').forEach(x=>x.classList.toggle('on',x===a));st('aeq_sat',SAT?'1':'0');LAY[YK].setStyle(style);});
+ return d;}});new C().addTo(map);
+ if(gt('aeq_sat')==='1')setTimeout(()=>document.querySelector('.basesw a[data-b=sat]').click(),0);})();

@@ -239,3 +239,10 @@ footer{border-top:1px solid var(--line)}
  .mtools{right:56px}.search{width:100%}
 }
 @media (max-width:860px){#mapwrap.pop .mtools{opacity:0;pointer-events:none}#mapwrap.pop .mtools>*{pointer-events:none}.mtools{transition:opacity .2s}}
+/* fond de carte : sélecteur Plan / Satellite, légende, numéros */
+.basesw{display:flex}
+.basesw a{width:auto!important;padding:0 12px;font:600 .78rem/36px Inter!important;color:var(--ink2)!important;text-decoration:none}
+.basesw a.on{background:rgba(255,255,255,.18)!important;color:var(--ink)!important}
+.lnote{font-size:.76rem;color:var(--ink3);margin-top:4px;line-height:1.35}
+.numlabel{font:700 10px Inter;color:#fff;text-shadow:0 0 3px rgba(0,0,0,.9),0 0 2px rgba(0,0,0,.9)}
+.leaflet-container{background:#0b0d12}
