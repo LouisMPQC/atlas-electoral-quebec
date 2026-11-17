@@ -5,120 +5,275 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Atlas électoral du Québec</title>
 <meta name="description" content="Les résultats électoraux du Québec, provincial et fédéral, région par région, circonscription par circonscription et section de vote par section de vote.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%233d8fe8'/%3E%3Cpath d='M8 22V10h6a4 4 0 010 8H8' stroke='%23fff' stroke-width='3' fill='none'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236aa8ff'/%3E%3Cstop offset='1' stop-color='%238b6cf0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='9' fill='url(%23g)'/%3E%3Cpath d='M9 23 16 8l7 15M11.5 18h9' stroke='%23fff' stroke-width='2.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/site.css?v=__V__">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,300;1,400&display=swap" rel="stylesheet">
 <style>
-:root{--pq:#3d8fe8;--bloc:#3fb6e8;--acc:#3d8fe8}
-.head{padding:8px 0 26px;border-bottom:1px solid var(--line);margin-bottom:26px}
-.head h1{overflow-wrap:anywhere}
-.head p{color:var(--ink2);max-width:62ch;font-size:.97rem;margin-top:8px}
-.doors{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.door{position:relative;display:block;text-align:left;cursor:pointer;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px 26px 22px;color:var(--ink);font:inherit;transition:border-color .15s,transform .15s,background .15s;overflow:hidden}
-.door::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--c)}
-.door:hover{border-color:var(--c);transform:translateY(-1px)}
-.door.on{border-color:var(--c);background:linear-gradient(135deg,color-mix(in srgb,var(--c) 14%,var(--panel)),var(--panel) 70%)}
-.door .lab{color:var(--c)}
-.door h2{font:700 2.3rem/1 var(--hd);margin:6px 0 10px}
-.door p{color:var(--ink2);font-size:.9rem;max-width:44ch}
-.door .meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:14px;font:500 .78rem var(--mono);color:var(--ink2)}
-.door .meta b{color:var(--ink);font-weight:600}
-.door .cta{display:inline-block;margin-top:16px;font:600 .85rem var(--body);color:var(--c)}
-#step{margin-top:30px}
-.sh{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:baseline;justify-content:space-between;margin-bottom:14px}
-.sh h3{font:700 1.6rem/1.1 var(--hd)}
-.sh a{font:600 .85rem var(--body);color:var(--acc);text-decoration:none}.sh a:hover{text-decoration:underline}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
-a.reg{display:flex;flex-direction:column;gap:10px;text-decoration:none;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:15px 16px 14px;transition:border-color .15s,background .15s}
-a.reg:hover{border-color:var(--acc);background:var(--panel2)}
-a.reg .t{min-height:1.25em}
-a.reg .n{font:600 1rem/1.25 var(--body)}
-a.reg .no{font:500 .68rem var(--mono);color:var(--ink3);white-space:nowrap;padding-top:3px}
-a.reg .k{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;font:500 .74rem var(--mono);color:var(--ink2)}
-a.reg .k b{font:700 1.35rem/1 var(--hd);color:var(--ink);display:block;margin-bottom:4px}a.reg .k small{font:600 .9rem var(--hd);color:var(--ink2)}
-a.reg .bar{margin-top:auto}
-a.reg .bar{height:6px;border-radius:4px;background:var(--panel2);overflow:hidden}
-a.reg .bar i{display:block;height:100%;background:var(--acc);border-radius:4px}
-a.reg.off{opacity:.6}
-a.reg .note{font-size:.76rem;color:var(--ink3)}
-.all{display:flex;align-items:center;justify-content:center;border-style:dashed}
-.all span{font:600 .9rem var(--body);color:var(--acc)}
-.parts{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.parts a{text-decoration:none;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 11px;font:500 .85rem var(--body)}.parts a:hover{border-color:var(--bloc)}
-.hint{color:var(--ink3);font-size:.86rem;margin-top:22px;text-align:center}
-@media (max-width:700px){.doors{grid-template-columns:1fr}.door{padding:18px 20px}.door h2{font-size:1.9rem}.grid{grid-template-columns:1fr 1fr}a.reg{padding:12px}}
-@media (max-width:380px){.grid{grid-template-columns:1fr}}
+:root{
+ --bg:#0b0d12;--ink:#f2f4f8;--ink2:#a9b0bd;--ink3:#6f7786;
+ --glass:rgba(255,255,255,.055);--glass2:rgba(255,255,255,.085);--line:rgba(255,255,255,.09);--line2:rgba(255,255,255,.16);
+ --acc:#5b9cff;--acc2:#8b6cf0;
+ --yel:#f6d873;--ora:#f5a766;--lav:#b9a6f6;--lim:#cbe981;--sky:#a8d9f8;--tile-ink:#16181d;
+ --r:22px;--r2:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.45 Inter,system-ui,sans-serif;font-feature-settings:"tnum" 1,"cv11" 1;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bgfx i{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55;transition:background 1s}
+.bgfx i:nth-child(1){width:55vw;height:55vw;left:-12vw;top:-18vw;background:var(--acc)}
+.bgfx i:nth-child(2){width:45vw;height:45vw;right:-10vw;top:10vh;background:var(--acc2);opacity:.38}
+.bgfx i:nth-child(3){width:40vw;height:40vw;left:30vw;bottom:-25vw;background:#1f7a8c;opacity:.3}
+.bgfx::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(11,13,18,.2),rgba(11,13,18,.85))}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+.app{position:relative;z-index:1;max-width:1480px;margin:22px auto;padding:0 22px}
+.frame{display:grid;grid-template-columns:268px minmax(0,1fr) 370px;background:rgba(18,21,28,.55);border:1px solid var(--line);border-radius:30px;backdrop-filter:blur(30px) saturate(140%);-webkit-backdrop-filter:blur(30px) saturate(140%);box-shadow:0 30px 80px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.06);overflow:hidden;min-height:calc(100vh - 44px)}
+/* --- barre latérale --- */
+.side{padding:22px 16px;border-right:1px solid var(--line);background:rgba(0,0,0,.18);display:flex;flex-direction:column;gap:18px;min-width:0}
+.brand{display:flex;gap:11px;align-items:center;padding:0 6px}
+.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--acc),var(--acc2));display:grid;place-items:center;box-shadow:0 6px 18px rgba(91,156,255,.35);flex:none;transition:background .6s}
+.logo svg{width:26px;height:26px}
+.brand b{display:block;font:700 .98rem/1.1 Inter}.brand span{font:400 .78rem Inter;color:var(--ink2)}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px}
+.seg button{border-radius:10px;padding:9px 6px;font:600 .86rem Inter;color:var(--ink2);transition:all .2s}
+.seg button small{display:block;font:500 .66rem Inter;opacity:.75;margin-top:1px}
+.seg button.on{background:rgba(255,255,255,.14);color:var(--ink);box-shadow:0 2px 10px rgba(0,0,0,.25)}
+.sl{display:flex;justify-content:space-between;align-items:center;font:600 .7rem Inter;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;padding:0 8px}
+.rlist{display:flex;flex-direction:column;gap:2px;overflow:auto;margin:-4px -6px;padding:4px 6px}
+.ri{display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:10px;align-items:center;padding:7px 8px;border-radius:11px;color:var(--ink2);font:500 .86rem Inter;text-align:left;width:100%;transition:background .15s,color .15s}
+.ri:hover{background:rgba(255,255,255,.06);color:var(--ink)}
+.ri.on{background:rgba(255,255,255,.11);color:var(--ink)}
+.ri svg{width:26px;height:26px}
+.ri svg path{fill:currentColor;opacity:.55}.ri.on svg path{fill:var(--acc);opacity:1}
+.ri .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ri .bd{font:600 .7rem Inter;color:var(--ink3);background:rgba(255,255,255,.06);border-radius:7px;padding:2px 6px}
+.ri.on .bd{color:var(--ink)}
+.parts{display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:var(--r2);background:rgba(246,216,115,.07);border:1px solid rgba(246,216,115,.18)}
+.parts .sl{color:var(--yel);padding:0 0 2px}
+.parts a{font:500 .8rem/1.3 Inter;color:var(--ink2);padding:5px 6px;border-radius:8px}.parts a:hover{background:rgba(255,255,255,.06);color:var(--ink)}
+.parts a b{color:var(--ink);font-weight:600;display:block}
+.cred{font:400 .72rem/1.4 Inter;color:var(--ink3);padding:0 8px;margin-top:auto}.cred b{color:var(--ink2);font-weight:600}
+/* --- centre --- */
+.main{padding:30px 32px 34px;min-width:0;display:flex;flex-direction:column;gap:22px}
+.hero{display:grid;grid-template-columns:150px minmax(0,1fr);gap:26px;align-items:center}
+.cover{width:150px;height:150px;border-radius:24px;background:linear-gradient(145deg,var(--acc),var(--acc2));display:grid;place-items:center;box-shadow:0 18px 40px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.3);position:relative;overflow:hidden;transition:background .6s}
+.cover::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.35),transparent 55%)}
+.cover svg{width:112px;height:112px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.25))}
+.cover path{fill:rgba(255,255,255,.92)}
+.hero h1{font:800 2.5rem/1.05 Inter;letter-spacing:-.02em;overflow-wrap:anywhere}
+.hero h1 em{font-weight:300;font-style:italic;color:var(--ink2)}
+.hero .sub{color:var(--ink2);font-size:.92rem;margin-top:8px}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.btn{display:inline-flex;align-items:center;gap:7px;border-radius:12px;padding:10px 15px;font:600 .86rem Inter;background:rgba(255,255,255,.08);border:1px solid var(--line);transition:all .15s}
+.btn:hover{background:rgba(255,255,255,.14)}
+.btn.pr{background:var(--ink);color:#111;border-color:transparent}.btn.pr:hover{background:#fff;transform:translateY(-1px)}
+.bento{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px}
+.tile{border-radius:var(--r);padding:16px 18px 15px;color:var(--tile-ink);position:relative;min-height:142px;display:flex;flex-direction:column;box-shadow:0 10px 26px rgba(0,0,0,.25);transition:transform .2s}
+.tile:hover{transform:translateY(-2px)}
+.tile .tl{font:700 .7rem Inter;letter-spacing:.07em;text-transform:uppercase;opacity:.8;display:flex;justify-content:space-between;align-items:center}
+.tile .tl i{width:26px;height:26px;border-radius:8px;background:rgba(255,255,255,.4);display:grid;place-items:center;font-style:normal;font-size:.8rem}
+.tile .big{font:700 2.5rem/1 Inter;letter-spacing:-.03em;margin-top:12px;display:flex;align-items:baseline;gap:6px}
+.tile .big small{font:600 1rem Inter;opacity:.6;letter-spacing:0}
+.tile .ds{font:500 .78rem/1.35 Inter;opacity:.78;margin-top:auto;padding-top:10px}
+.tile .ds b{font-weight:700;opacity:1}
+.t-yel{background:var(--yel);grid-column:span 3}.t-ora{background:var(--ora);grid-column:span 3}
+.t-lav{background:var(--lav);grid-column:span 2}.t-lim{background:var(--lim);grid-column:span 2}.t-sky{background:var(--sky);grid-column:span 2}
+.dots{display:flex;flex-wrap:wrap;gap:4px;margin-top:12px}
+.dots span{width:13px;height:13px;border-radius:50%;box-shadow:0 0 0 2px rgba(255,255,255,.55)}
+.panel{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px}
+.ph{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.ph h2{font:700 1.05rem Inter}
+.ph span{font:500 .78rem Inter;color:var(--ink3)}
+.stack{display:flex;height:14px;border-radius:8px;overflow:hidden;gap:2px;margin-bottom:14px}
+.stack i{display:block;height:100%}
+.pbars{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px 22px}
+.pb{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:9px;align-items:center;font:500 .86rem Inter}
+.pb i{width:12px;height:12px;border-radius:4px}
+.pb .s{color:var(--ink3);font-size:.76rem;font-weight:500}
+.pb b{font-weight:700}
+.pb.me{color:var(--ink)}.pb.me b{color:var(--acc)}
+.note{display:flex;gap:14px;align-items:flex-start}
+.note p{color:var(--ink2);font-size:.92rem;max-width:62ch}
+/* --- colonne de droite --- */
+.right{border-left:1px solid var(--line);background:rgba(0,0,0,.12);padding:22px 18px;display:flex;flex-direction:column;gap:12px;min-width:0;max-height:calc(100vh - 44px)}
+.right .sl{padding:0 4px}
+.search{position:relative}
+.search input{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:12px;padding:10px 12px 10px 36px;color:var(--ink);font:500 .88rem Inter;outline:none;transition:border-color .15s}
+.search input:focus{border-color:var(--line2);background:rgba(255,255,255,.09)}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--ink3)}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);background:rgba(255,255,255,.05);border-radius:12px;padding:3px;gap:3px}
+.tabs button{border-radius:9px;padding:7px 4px;font:600 .76rem Inter;color:var(--ink2)}
+.tabs button.on{background:rgba(255,255,255,.14);color:var(--ink)}
+.clist{display:flex;flex-direction:column;gap:8px;overflow:auto;margin:0 -6px;padding:2px 6px 6px;flex:1}
+.cc{display:block;background:var(--glass);border:1px solid var(--line);border-radius:var(--r2);padding:12px 14px;transition:background .15s,border-color .15s,transform .15s}
+.cc:hover{background:var(--glass2);border-color:var(--line2);transform:translateX(2px)}
+.cc .t{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.cc .t b{font:600 .92rem/1.25 Inter}
+.cc .t .pp{font:700 .92rem Inter;white-space:nowrap}
+.cc .e{display:flex;align-items:center;gap:7px;font:500 .78rem Inter;color:var(--ink2);margin-top:5px;flex-wrap:wrap}
+.tag{display:inline-flex;align-items:center;gap:5px;font:700 .68rem Inter;border-radius:6px;padding:2px 7px;color:#111}
+.cc .m{display:flex;justify-content:space-between;gap:8px;font:500 .74rem Inter;color:var(--ink3);margin-top:8px}
+.cc .bar{height:4px;border-radius:3px;background:rgba(255,255,255,.07);margin-top:8px;overflow:hidden}.cc .bar i{display:block;height:100%;border-radius:3px}
+.up{color:#8fe3a4}.dn{color:#ff8f86}
+.b26{display:inline-block;font:700 .64rem Inter;color:#16181d;background:var(--yel);border-radius:6px;padding:2px 6px;margin-top:7px}
+.empty{color:var(--ink3);font-size:.86rem;padding:20px 6px;text-align:center}
+.cnt{font:600 .7rem Inter;color:var(--ink3)}
+/* --- apparition --- */
+.fade{animation:fd .35s ease both}@keyframes fd{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* --- mobile et tablette --- */
+.msel{display:none}
+@media (max-width:1180px){.frame{grid-template-columns:240px minmax(0,1fr)}.side{grid-row:span 2}.right{grid-column:2;border-left:0;border-top:1px solid var(--line);max-height:none;position:static}.clist{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}}
+@media (max-width:820px){
+ .side{grid-row:auto}.right{grid-column:1}
+ .app{margin:0;padding:0}.frame{grid-template-columns:1fr;border-radius:0;border:0;min-height:100vh}
+ .side{border-right:0;border-bottom:1px solid var(--line);gap:14px;padding:18px 16px}
+ .rlist,.side>.sl.rs,.parts,.cred{display:none}
+ .msel{display:block}.msel select{width:100%;appearance:none;background:rgba(255,255,255,.07) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a9b0bd' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center/18px;border:1px solid var(--line);border-radius:12px;padding:12px 40px 12px 14px;color:var(--ink);font:600 .95rem Inter}
+ .msel option{background:#1a1d24}
+ .main{padding:20px 16px 24px;gap:16px}
+ .hero{grid-template-columns:84px minmax(0,1fr);gap:16px;align-items:start}.cover{width:84px;height:84px;border-radius:18px}.cover svg{width:62px;height:62px}
+ .hero h1{font-size:1.65rem}.hero .sub{font-size:.84rem}
+ .bento{grid-template-columns:1fr 1fr;gap:10px}.t-yel,.t-ora{grid-column:span 2}.t-lav,.t-lim,.t-sky{grid-column:span 1}.t-sky{grid-column:span 2}
+ .tile{min-height:120px;padding:14px 15px}.tile .big{font-size:2rem}
+ .right{padding:18px 16px}.clist{display:flex}
+}
 </style>
 </head>
 <body>
-<div class="wrap">
- <header class="head">
-  <div class="kick">Résultats électoraux · provincial et fédéral</div>
-  <h1>Atlas électoral du Québec</h1>
-  <p>Les résultats des élections au Québec, région par région, circonscription par circonscription et section de vote par section de vote. Choisissez d’abord le palier, puis la région. <span class="by">Outil conçu par <b>Louis Morin Payette</b>.</span></p>
- </header>
+<div class="bgfx"><i></i><i></i><i></i></div>
+<div class="app"><div class="frame">
 
- <div class="doors" role="tablist" aria-label="Palier">
-  <button class="door" role="tab" data-n="fed" style="--c:var(--bloc)">
-   <div class="lab">Palier fédéral</div><h2>Fédéral</h2>
-   <p>Les 78 circonscriptions fédérales du Québec, lues du point de vue du Bloc Québécois.</p>
-   <div class="meta"><span>Élections <b>2021</b> et <b>2025</b></span><span id="mfed"></span></div>
-   <span class="cta">Choisir une région →</span>
-  </button>
-  <button class="door" role="tab" data-n="prov" style="--c:var(--pq)">
-   <div class="lab">Palier provincial</div><h2>Provincial</h2>
-   <p>Les 127 circonscriptions provinciales du Québec, lues du point de vue du Parti Québécois.</p>
-   <div class="meta"><span>Élections <b>2018</b>, <b>2022</b> et <b>2026</b></span><span id="mprov"></span></div>
-   <span class="cta">Choisir une région →</span>
-  </button>
- </div>
+ <aside class="side">
+  <div class="brand"><div class="logo"><svg viewBox="0 0 100 100"><path id="logop" fill="#fff"/></svg></div><div><b>Atlas électoral</b><span>du Québec</span></div></div>
+  <div class="seg" role="tablist" aria-label="Palier">
+   <button role="tab" data-n="prov">Provincial<small>2018 · 2022 · 2026</small></button>
+   <button role="tab" data-n="fed">Fédéral<small>2021 · 2025</small></button>
+  </div>
+  <div class="msel"><select id="msel" aria-label="Région"></select></div>
+  <div class="sl rs"><span>Régions</span><span class="cnt" id="slc"></span></div>
+  <nav class="rlist" id="rlist" aria-label="Régions"></nav>
+  <div class="parts"><div class="sl">Partielles · 7 décembre 2026</div><div id="parts"></div></div>
+  <div class="cred">Outil conçu par <b>Louis Morin Payette</b>, avec l’aide de Claude (Anthropic). Données : Élections Québec et Élections Canada.</div>
+ </aside>
 
- <section id="step" hidden>
-  <div class="sh"><h3 id="sht"></h3><a id="sha" href="#"></a></div>
-  <div class="grid" id="grid"></div>
- </section>
- <p class="hint" id="hint">Choisissez un palier pour afficher les 17 régions administratives.</p>
+ <main class="main" id="main"></main>
 
- <section class="card" style="padding:16px 20px;margin-top:28px;border-color:rgba(242,193,78,.35)">
-  <div class="lab" style="color:var(--warn)">Élections partielles fédérales le 7 décembre 2026</div>
-  <div class="parts" id="parts"></div>
- </section>
+ <aside class="right">
+  <div class="sl"><span id="rt">Circonscriptions</span><span class="cnt" id="rc"></span></div>
+  <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" placeholder="Chercher une circonscription ou une personne" autocomplete="off" aria-label="Chercher"></label>
+  <div class="tabs" id="tabs"><button data-o="a" class="on">A à Z</button><button data-o="p" id="tbp">Plus forts</button><button data-o="g">Serrées</button></div>
+  <div class="clist" id="clist"></div>
+ </aside>
 
- <footer>Données : Élections Québec et Élections Canada, résultats officiels par bureau de vote et limites des sections de vote. Les comparaisons entre élections sont des estimations calculées par l’outil, et non des données officielles. Outil conçu par <b style="color:var(--ink2)">Louis Morin Payette</b>, avec l’aide de Claude, un modèle d’intelligence artificielle d’Anthropic.</footer>
-</div>
+</div></div>
 <script>
-(function(){const h=(location.hash.match(/r=(\d+)/)||[])[1];if(h)location.replace('provincial/#r='+h);})();
 const $=id=>document.getElementById(id);
-const f1=x=>x.toFixed(1).replace('.',',');
-const CFG={prov:{t:'Provincial',c:'#3d8fe8',me:'PQ',yr:'2026',seat:'sièges PQ',path:'provincial/',nc:127},
-           fed:{t:'Fédéral',c:'#3fb6e8',me:'Bloc',yr:'2025',seat:'sièges Bloc',path:'federal/',nc:78}};
-let N,MODE=null;
-const FEDR=r=>r==='10'?'08':r; // Nord-du-Québec : couvert par Abitibi–Baie-James–Nunavik–Eeyou
-function show(m,scroll){
- MODE=m;const c=CFG[m],S=N[m];
- document.documentElement.style.setProperty('--acc',c.c);
- document.querySelectorAll('.door').forEach(b=>{b.classList.toggle('on',b.dataset.n===m);b.setAttribute('aria-selected',b.dataset.n===m);});
- history.replaceState(null,'',location.pathname+'#'+m);
- $('step').hidden=false;$('hint').hidden=true;
- $('sht').textContent=c.t+' · les 17 régions';
- $('sha').href=c.path;$('sha').textContent='Tout le Québec ('+c.nc+' circonscriptions) →';
- const rs=Object.keys(N.regions).sort((a,b)=>N.regions[a].localeCompare(N.regions[b],'fr'));
- $('grid').innerHTML=rs.map(r=>{
-  const nord=m==='fed'&&r==='10',s=S[m==='fed'?FEDR(r):r];
-  if(nord)return '<a class="reg off" href="'+c.path+'#r=08"><div class="t"><span class="n">'+N.regions[r]+'</span></div><div class="note">Pas de circonscription fédérale propre : le territoire fait partie d’Abitibi–Baie-James–Nunavik–Eeyou, rattachée à l’Abitibi-Témiscamingue.</div></a>';
-  return '<a class="reg" href="'+c.path+'#r='+r+'"><div class="t"><span class="n">'+N.regions[r]+'</span></div>'+
-   '<div class="k"><span><b>'+s.me+' <small>/ '+s.n+'</small></b>'+c.seat+'</span><span style="text-align:right"><b>'+f1(s.pc)+' %</b>'+c.me+' en '+c.yr+'</span></div>'+
-   '<div class="bar" title="'+c.me+' '+c.yr+' : '+f1(s.pc)+' %"><i style="width:'+Math.min(100,s.pc*2)+'%"></i></div></a>';}).join('')+
-  '<a class="reg all" href="'+c.path+'"><span>Tout le Québec →</span></a>';
- if(scroll)$('step').scrollIntoView({behavior:'smooth',block:'start'});
+const f1=x=>x==null?'—':x.toFixed(1).replace('.',',');
+const sg=x=>(x>=0?'+':'−')+f1(Math.abs(x));
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const CFG={
+ prov:{t:'au provincial',me:'PQ',meL:'le PQ',meN:'Parti Québécois',c1:'#4a8dff',c2:'#7b5cf0',date:'élection générale du 5 octobre 2026',
+  path:'provincial/',cpath:'circonscription/',
+  ab:{PQ:'PQ',CAQ:'CAQ',PLQ:'PLQ',QS:'QS',PCQ:'PCQ',AUT:'Autres'},
+  nm:{PQ:'Parti Québécois',CAQ:'Coalition avenir Québec',PLQ:'Parti libéral du Québec',QS:'Québec solidaire',PCQ:'Parti conservateur du Québec',AUT:'Autres'},
+  pc:{PQ:'#4a8dff',CAQ:'#2cc6d6',PLQ:'#ef5a52',QS:'#ff9a3c',PCQ:'#9b7cf2',AUT:'#8a96a3'}},
+ fed:{t:'au fédéral',me:'BQ',meL:'le Bloc',meN:'Bloc Québécois',c1:'#35b8ec',c2:'#1f6fd1',date:'élection générale du 28 avril 2025',
+  path:'federal/',cpath:'federal/',
+  ab:{BQ:'Bloc',PLC:'PLC',NPD:'NPD',PCC:'PCC',PV:'PV',AUT:'Autres'},
+  nm:{BQ:'Bloc Québécois',PLC:'Parti libéral du Canada',NPD:'Nouveau Parti démocratique',PCC:'Parti conservateur du Canada',PV:'Parti vert',AUT:'Autres'},
+  pc:{BQ:'#35b8ec',PLC:'#ef5a52',NPD:'#ff9a3c',PCC:'#5f86d8',PV:'#4cbf72',AUT:'#8a96a3'}}};
+let N,MODE='prov',REG='QC',ORD='a';
+const ME=()=>CFG[MODE].me;
+function parseHash(){
+ const h=location.hash.slice(1);let m=h.match(/^(prov|fed)(?:\/(\d\d|QC))?$/);
+ if(m){MODE=m[1];REG=m[2]||'QC';return;}
+ m=h.match(/^r=(\d\d)$/);if(m){MODE='prov';REG=m[1];return;}
+ try{const s=localStorage.getItem('atlas-palier');if(s==='fed'||s==='prov')MODE=s;}catch(e){}
 }
-document.querySelectorAll('.door').forEach(b=>b.onclick=()=>show(b.dataset.n,true));
+function setHash(){history.replaceState(null,'','#'+MODE+(REG==='QC'?'':'/'+REG));try{localStorage.setItem('atlas-palier',MODE);}catch(e){}}
+const fedR=r=>MODE==='fed'&&r==='10'?'08':r;
+const regName=r=>r==='QC'?'Tout le Québec':N.regions[r];
+const sil=(r,cls)=>'<svg viewBox="0 0 100 100"'+(cls?' class="'+cls+'"':'')+' aria-hidden="true"><path d="'+N.sil[r]+'"/></svg>';
+function regs(){return Object.keys(N.regions).sort((a,b)=>N.regions[a].localeCompare(N.regions[b],'fr'));}
+function circs(){const P=N[MODE];if(REG==='QC')return P.circ.slice();return P.circ.filter(c=>c.r===fedR(REG));}
+function regionLink(){return CFG[MODE].path+(REG==='QC'?'':'#r='+fedR(REG));}
+
+function side(){
+ const c=CFG[MODE],P=N[MODE];
+ document.querySelectorAll('.seg button').forEach(b=>{b.classList.toggle('on',b.dataset.n===MODE);b.setAttribute('aria-selected',b.dataset.n===MODE);});
+ const item=r=>{const s=r==='QC'?P.reg.QC:P.reg[fedR(r)],off=MODE==='fed'&&r==='10';
+  return '<button class="ri'+(r===REG?' on':'')+'" data-r="'+r+'" title="'+esc(regName(r))+'">'+sil(r)+'<span class="nm">'+esc(regName(r))+'</span><span class="bd">'+(off?'—':(s.seats[c.me]||0)+'/'+s.n)+'</span></button>';};
+ $('rlist').innerHTML=item('QC')+regs().map(item).join('');
+ $('rlist').querySelectorAll('.ri').forEach(b=>b.onclick=()=>go(b.dataset.r));
+ $('slc').textContent='sièges '+c.ab[c.me];
+ $('msel').innerHTML=['QC'].concat(regs()).map(r=>'<option value="'+r+'"'+(r===REG?' selected':'')+'>'+esc(regName(r))+'</option>').join('');
+ const rt=document.documentElement.style;rt.setProperty('--acc',c.c1);rt.setProperty('--acc2',c.c2);
+ $('tbp').textContent=c.ab[c.me]+' plus fort';
+}
+
+function main(){
+ const c=CFG[MODE],P=N[MODE],me=c.me;
+ if(MODE==='fed'&&REG==='10'){
+  $('main').innerHTML='<div class="hero fade"><div class="cover">'+sil('10')+'</div><div><h1>Nord-du-Québec <em>'+c.t+'</em></h1><div class="sub">Pas de circonscription fédérale propre</div></div></div>'+
+  '<div class="panel note fade"><p>Au fédéral, le Nord-du-Québec fait partie d’<b>Abitibi–Baie-James–Nunavik–Eeyou</b>, une circonscription rattachée dans l’atlas à la région de l’Abitibi-Témiscamingue, où habite la majorité de ses électeurs.</p></div>'+
+  '<div class="acts fade"><button class="btn pr" data-go="08">Voir l’Abitibi-Témiscamingue →</button><a class="btn" href="federal/abitibi-baie-james-nunavik-eeyou/">Ouvrir la circonscription</a></div>';
+  $('main').querySelector('[data-go]').onclick=()=>go('08');return;}
+ const s=P.reg[REG],cs=circs(),won=s.seats[me]||0,mp=s.pc[me]||0;
+ const ranked=Object.keys(s.pc).filter(p=>p!=='AUT').sort((a,b)=>s.pc[b]-s.pc[a]),rk=ranked.indexOf(me)+1;
+ const ev=s.pv==null?null:mp-s.pv;
+ const dots=cs.slice().sort((a,b)=>(b.w===me)-(a.w===me)||a.w.localeCompare(b.w)).map(x=>'<span title="'+esc(x.n)+' : '+c.ab[x.w]+'" style="background:'+c.pc[x.w]+'"></span>').join('');
+ const close=cs.filter(x=>Math.abs(x.g)<5),closeW=close.filter(x=>x.w===me).length;
+ const best=cs.slice().sort((a,b)=>b.p-a.p)[0];
+ const lead=Object.keys(s.seats).sort((a,b)=>s.seats[b]-s.seats[a])[0];
+ const parties=Object.keys(s.pc).filter(p=>s.pc[p]>=0.5).sort((a,b)=>(b===me)-(a===me)||s.pc[b]-s.pc[a]);
+ $('main').innerHTML=
+ '<div class="hero fade"><div class="cover">'+sil(REG)+'</div><div>'+
+  '<h1>'+esc(regName(REG))+' <em>'+c.t+'</em></h1>'+
+  '<div class="sub">'+s.n+' circonscription'+(s.n>1?'s':'')+' · '+c.date+' · lu du point de vue du '+c.meN+'</div>'+
+  '<div class="acts"><a class="btn pr" href="'+regionLink()+'">Ouvrir la carte '+(REG==='QC'?'du Québec':'de la région')+' →</a>'+(REG==='QC'?'':'<button class="btn" data-go="QC">Tout le Québec</button>')+'</div></div></div>'+
+ '<div class="bento fade">'+
+  '<div class="tile t-yel"><div class="tl">Sièges '+c.ab[me]+'<i>▣</i></div><div class="big">'+won+'<small>sur '+s.n+'</small></div><div class="dots">'+dots+'</div><div class="ds">'+(lead===me?c.ab[me]+' en tête de la région':'Région dominée par '+c.ab[lead]+' ('+s.seats[lead]+' siège'+(s.seats[lead]>1?'s':'')+')')+'</div></div>'+
+  '<div class="tile t-ora"><div class="tl">Vote '+c.ab[me]+' en '+P.yr+'<i>%</i></div><div class="big">'+f1(mp)+'<small>%</small></div><div class="ds"><b>'+rk+(rk===1?'<sup>er</sup>':'<sup>e</sup>')+'</b> parti de la région'+(best?' · meilleur résultat : <b>'+esc(best.n)+'</b> ('+f1(best.p)+' %)':'')+'</div></div>'+
+  '<div class="tile t-lav"><div class="tl">Depuis '+P.prev+'<i>↗</i></div><div class="big">'+(ev==null?'—':sg(ev))+'<small>pts</small></div><div class="ds">'+c.ab[me]+' : '+f1(s.pv)+' % → '+f1(mp)+' %<br>(estimation sur les limites actuelles)</div></div>'+
+  '<div class="tile t-lim"><div class="tl">Courses serrées<i>⚡</i></div><div class="big">'+close.length+'</div><div class="ds">écart de moins de 5 points pour '+c.meL+' · <b>'+closeW+'</b> gagnée'+(closeW>1?'s':'')+', <b>'+(close.length-closeW)+'</b> perdue'+(close.length-closeW>1?'s':'')+'</div></div>'+
+  '<div class="tile t-sky"><div class="tl">Participation<i>◎</i></div><div class="big">'+f1(s.pa)+'<small>%</small></div><div class="ds">des électeurs inscrits ont voté en '+P.yr+'</div></div>'+
+ '</div>'+
+ '<section class="panel fade"><div class="ph"><h2>Répartition du vote en '+P.yr+'</h2><span>'+esc(regName(REG))+'</span></div>'+
+  '<div class="stack">'+parties.slice().sort((a,b)=>s.pc[b]-s.pc[a]).map(p=>'<i style="width:'+s.pc[p]+'%;background:'+c.pc[p]+'" title="'+c.ab[p]+' '+f1(s.pc[p])+' %"></i>').join('')+'</div>'+
+  '<div class="pbars">'+parties.map(p=>'<div class="pb'+(p===me?' me':'')+'"><i style="background:'+c.pc[p]+'"></i><span>'+c.nm[p]+'<br><span class="s">'+(s.seats[p]||0)+' siège'+((s.seats[p]||0)>1?'s':'')+'</span></span><b>'+f1(s.pc[p])+' %</b></div>').join('')+'</div></section>';
+ $('main').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+}
+
+function list(){
+ const c=CFG[MODE],me=c.me,q=$('q').value.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+ let cs=circs();
+ if(q)cs=N[MODE].circ.filter(x=>(x.n+' '+x.e+' '+x.m).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').includes(q));
+ if(ORD==='p'||(ORD==='g'&&q))cs.sort((a,b)=>b.p-a.p);else if(ORD==='g'&&!q)cs=cs.filter(x=>Math.abs(x.g)<10).sort((a,b)=>Math.abs(a.g)-Math.abs(b.g));
+ $('rt').textContent=q?'Résultats de recherche':'Circonscriptions · '+regName(REG);
+ $('rc').textContent=cs.length;
+ if(!cs.length){$('clist').innerHTML='<div class="empty">'+(ORD==='g'&&!q?'Aucune course à moins de 10 points pour '+c.meL+' ici.':'Aucune circonscription trouvée.')+'</div>';return;}
+ const mx=Math.max(...cs.map(x=>x.p),1);
+ $('clist').innerHTML=cs.map(x=>{
+  const ev=x.pv==null?null:x.p-x.pv;
+  return '<a class="cc" href="'+c.cpath+x.s+'/"><div class="t"><b>'+esc(x.n)+'</b><span class="pp" style="color:'+c.pc[me]+'">'+f1(x.p)+' %</span></div>'+
+  '<div class="e"><span class="tag" style="background:'+c.pc[x.w]+'">'+c.ab[x.w]+'</span>'+esc(x.e)+'</div>'+
+  '<div class="bar"><i style="width:'+(100*x.p/Math.max(mx,40))+'%;background:'+c.pc[me]+'"></i></div>'+
+  '<div class="m"><span>'+c.ab[me]+' '+x.rk+(x.rk===1?'<sup>er</sup>':'<sup>e</sup>')+' · '+(x.w===me?'avance ':'écart ')+sg(x.g)+' pts</span>'+(ev==null?'':'<span class="'+(ev>=0?'up':'dn')+'">'+sg(ev)+' depuis '+N[MODE].prev+'</span>')+'</div>'+
+  (x.b26?'<span class="b26">Partielle le 7 décembre · '+esc(x.b26)+'</span>':'')+'</a>';}).join('');
+}
+
+function render(){side();main();list();setHash();}
+function go(r){REG=r;render();if(innerWidth<=820)$('main').scrollIntoView({behavior:'smooth'});}
+document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{if(MODE===b.dataset.n)return;MODE=b.dataset.n;render();});
+$('msel').onchange=e=>go(e.target.value);
+$('q').oninput=list;
+$('tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{ORD=b.dataset.o;$('tabs').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));list();});
+addEventListener('hashchange',()=>{parseHash();render();});
 fetch('assets/regions.json?v=__V__').then(r=>r.json()).then(d=>{N=d;
- const tot=k=>Object.values(N[k]).reduce((a,s)=>a+s.me,0);
- $('mfed').innerHTML='<b>'+tot('fed')+'</b> sièges Bloc en 2025';$('mprov').innerHTML='<b>'+tot('prov')+'</b> sièges PQ en 2026';
- $('parts').innerHTML=N.parts.map(p=>'<a href="federal/'+p.s+'/"><b>'+p.n+'</b> · '+p.b+' pour le Bloc</a>').join('');
- const h=location.hash.slice(1);if(h==='fed'||h==='prov')show(h,false);
+ $('logop').setAttribute('d',N.sil.QC);
+ $('parts').innerHTML=N.fed.circ.filter(x=>x.b26).map(x=>'<a href="federal/'+x.s+'/"><b>'+esc(x.n)+'</b>'+esc(x.b26)+' pour le Bloc</a>').join('');
+ parseHash();render();
 });
 </script>
 </body>
