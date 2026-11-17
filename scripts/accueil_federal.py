@@ -73,6 +73,7 @@ s = s[:i] + ''' <div class="help">
  </div>
  <footer>Données : Élections Canada, résultats officiels par bureau de vote des élections générales de 2021 et 2025 et limites des sections de vote. Secteurs à Montréal : quartiers de référence de la Ville de Montréal. Les comparaisons entre élections sont des estimations calculées par l’outil, et non des données officielles. Géolocalisation des adresses : Adresses Québec. Fond de carte : Esri. Outil conçu par <b style="color:var(--ink2)">Louis Morin Payette</b>, avec l’aide de Claude, un modèle d’intelligence artificielle d’Anthropic.</footer>''' + s[j:]
 R("const rk=Object.keys(N.regions)", "$('parts').innerHTML=N.circ.filter(c=>c.bq26).map(c=>'<a class=\"btn\" style=\"text-decoration:none\" href=\"'+c.s+'/\"><b>'+c.n+'</b> · '+c.bq26+' pour le Bloc</a>').join('');\n const rk=Object.keys(N.regions)")
+s = s.replace("attribution:'Fond : Esri · Données : Élections Québec'", "attribution:'Fond : Esri · Données : Élections Canada'")
 open('gabarits/accueil_federal.html', 'w', encoding='utf-8').write(s)
 for m in sorted(set(re.findall(r"[^'\"<>]{0,40}(?:PQ|2026|2022|2018|y18|y22|circonscription/|quebec\.json)[^'\"<>]{0,40}", s))):
     print('>>', m)

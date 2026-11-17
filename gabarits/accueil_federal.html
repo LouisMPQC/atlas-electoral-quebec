@@ -102,7 +102,7 @@ const hval=c=>HQ==='pq'?pct(c.v,ME):HQ==='gap'?gapPQ(c):progPQ(c);
 const hfill=c=>{if(HQ==='win')return PC[win(c.v)];const v=hval(c);return v==null?'#2a313c':HQS[HQ].bins.find(b=>v>=b[0])[1];};
 const map=L.map('hmap',{zoomControl:false,minZoom:4,maxZoom:12}).setView([47.5,-71.5],5);
 L.control.zoom({position:'topright'}).addTo(map);
-L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{maxNativeZoom:16,attribution:'Fond : Esri · Données : Élections Québec'}).addTo(map);
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{maxNativeZoom:16,attribution:'Fond : Esri · Données : Élections Canada'}).addTo(map);
 let LAY,BYC={};
 function style(f){const c=BYC[f.properties.c];const on=!REG||c.r===REG;return{color:on?'#e3eaf2':'#2a3343',weight:on?.9:.4,opacity:on?.7:.5,fillColor:on?hfill(c):'#151b24',fillOpacity:on?.78:.35};}
 function popup(c){const v=c.v,w=win(v),rk=rankOf(v,ME),g=gapPQ(c),pr=progPQ(c);

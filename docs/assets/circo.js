@@ -134,6 +134,8 @@ function popup(p){const k=p.k,d=R()[k];
   h+='<div class="pb'+(x===ME?' me':'')+'"><span class="nm">'+PL[x]+'</span><span class="tr"><i style="width:'+Math.min(100,v/70*100)+'%;background:'+PC[x]+'"></i></span><span class="pc">'+f1(v)+' %</span></div>';});
   const e=E(k);let ev='';if(YK===CUR&&e&&!A){EVS.forEach(([y,yl])=>{if(e[y]){const v=pct(d,ME)-e[y][ME];ev+=' Depuis '+yl+' : <b>'+(v>=0?'+':'')+f1(v)+' pts</b>.';}});if(ev)ev=' '+NM+' (estimation sur cette section) :'+ev;}
   h+='<div class="ft">'+n0(tot(d))+(A?' votes par anticipation dans ce bureau.':' votes le jour du scrutin.')+ev+'</div>';}
+ const cc=BYN[YK]&&BYN[YK][k]?BYN[YK][k].getBounds().getCenter():null;
+ if(cc)h+='<div class="pact"><a href="https://www.google.com/maps/dir/?api=1&destination='+cc.lat.toFixed(5)+','+cc.lng.toFixed(5)+'" target="_blank" rel="noopener">Itinéraire</a><button onclick="shareSec(\''+k+'\')">Copier le lien</button></div>';
  return h+'</div>';}
 function tipTxt(p){const k=p.k,d=R()[k],n='Section '+lab(k)+(FILT.ty==='anti'&&C().A[bvaOf(k)]?' ('+C().A[bvaOf(k)].lab+')':'');if(isReg(d))return n+' · comptée avec la '+(d&&d.regr?lab(d.regr):'voisine');
  if(Q==='win')return n+' · 1er : '+PL[win(d)];
@@ -149,7 +151,7 @@ YKS.forEach(yk=>{ALAY[yk]=L.geoJSON(DATA[yk].Afc,{pane:'bva',interactive:false,s
 function bvaLayer(){YKS.forEach(yk=>{const on=yk===YK&&FILT.ty==='anti';[ALAY[yk],ALBL[yk]].forEach(l=>on?map.addLayer(l):map.removeLayer(l));});}
 const LAY={},BYN={},FEAT={};
 YKS.forEach(yk=>{BYN[yk]={};FEAT[yk]={};LAY[yk]=L.geoJSON(DATA[yk].fc,{style,onEachFeature:(f,l)=>{BYN[yk][f.properties.k]=l;FEAT[yk][f.properties.k]=f.properties;
- l.bindPopup(()=>popup(f.properties),{maxWidth:320});
+ l.bindPopup(()=>popup(f.properties),{maxWidth:320,autoPanPaddingTopLeft:L.point(12,innerWidth<860?48:70),autoPanPaddingBottomRight:L.point(12,70)});
  l.bindTooltip(()=>tipTxt(f.properties),{sticky:true,className:'tip',direction:'top',offset:[0,-8]});
  l.on('mouseover',e=>{e.target.setStyle({weight:2.4,color:'#ffffff'});e.target.bringToFront();});
  l.on('mouseout',e=>{LAY[YK].resetStyle(e.target);});}});});
@@ -203,7 +205,8 @@ let ns=[];function nums(){ns.forEach(m=>map.removeLayer(m));ns=[];if(!$('lbl').c
 $('lbl').onchange=nums;
 const seeB=$('see');seeB.checked=SEE;if(SEE)$('lbl').checked=true;seeB.onchange=()=>{SEE=seeB.checked;st('aeq_see',SEE?'1':'0');LAY[YK].setStyle(style);$('lbl').checked=SEE;nums();maskLayer();};
 function goto(k){const l=BYN[YK][k];if(!l)return;$('mapcard').scrollIntoView({behavior:'smooth',block:'start'});
- map.flyToBounds(l.getBounds(),{maxZoom:16,padding:[60,60]});setTimeout(()=>l.openPopup(),600);}
+ let done=false;const op=()=>{if(!done){done=true;l.openPopup();}};map.once('moveend',()=>setTimeout(op,50));setTimeout(op,2500);
+ map.flyToBounds(l.getBounds(),{maxZoom:16,padding:[60,60]});}
 const q=$('q'),sug=$('sug');
 q.oninput=()=>{const v=q.value.trim();sug.innerHTML='';if(!v){sug.classList.remove('on');return;}
  const m=Object.keys(BYN[YK]).filter(k=>String(lab(k)).startsWith(v)).sort((a,b)=>parseInt(lab(a))-parseInt(lab(b))).slice(0,7);if(!m.length){sug.classList.remove('on');return;}
@@ -255,7 +258,7 @@ function renderTab(){const el=$('tab');
   const wl={};rows.forEach(r=>wl[r.win]=(wl[r.win]||0)+1);
   const P5=PO.filter(p=>p!=='AUT'),cur=k=>SORT.k===k?' cur':'';
   const cell=(r,p)=>'<td class="pc2'+cur(p)+'"><b'+(p===ME?' style="color:var(--bq)"':'')+'>'+f1(r[p])+' %</b><small>'+n0(r.v[p]||0)+'</small><i style="width:calc((100% - 24px)*'+(Math.min(r[p],70)/70).toFixed(3)+');background:'+PC[p]+'"></i></td>';
-  el.innerHTML='<div class="ctrl"><span class="lab">'+(rows.length?Object.keys(n).sort((a,b)=>TYO[a]-TYO[b]).map(t=>n[t]+' '+(t==='Jour du scrutin'?'sections (jour du scrutin)':t==='Anticipation'?'bureaux par anticipation':'bureaux de votes spéciaux')).join(' · ')+' · en tête : '+PO.filter(p=>wl[p]).sort((a,b)=>wl[b]-wl[a]).map(p=>AB[p]+' '+wl[p]).join(', '):'Aucun bureau ne correspond aux filtres')+'</span><button class="btn" id="csv">Copier le tableau (CSV)</button></div>'+
+  el.innerHTML='<div class="ctrl"><span class="lab">'+(rows.length?Object.keys(n).sort((a,b)=>TYO[a]-TYO[b]).map(t=>n[t]+' '+(t==='Jour du scrutin'?'sections (jour du scrutin)':t==='Anticipation'?'bureaux par anticipation':'bureaux de votes spéciaux')).join(' · ')+' · en tête : '+PO.filter(p=>wl[p]).sort((a,b)=>wl[b]-wl[a]).map(p=>AB[p]+' '+wl[p]).join(', '):'Aucun bureau ne correspond aux filtres')+'</span><button class="btn" id="csv">Copier le tableau (CSV)</button><button class="btn" onclick="window.print()">Imprimer</button></div>'+
    '<div class="tw"><table><thead><tr>'+th('k','Bureau',SORT,'l')+th('sec',secLab(),SORT,'l')+P5.map(p=>th(p,'<span class="tag" style="background:'+PC[p]+';padding:0 4px;margin-right:4px">&nbsp;</span>'+AB[p],SORT,cur(p))).join('')+th('AUT','Autres',SORT)+th('win','En tête',SORT,'l')+th('gap','Écart',SORT,cur('gap'))+th('tv','B.V.',SORT,cur('tv'))+th('br','B.R.',SORT,cur('br'))+th('ins','É.I.',SORT,cur('ins'))+th('part','Particip.',SORT,cur('part'))+'</tr></thead><tbody>'+
    rows.map(r=>'<tr data-k="'+r.k+'"><td>'+r.lab+(r.typ!=='Jour du scrutin'?'<span class="ty2">'+r.typ+'</span>':'')+(r.sub?'<span class="sub" title="'+r.sub+'">'+r.sub+'</span>':'')+'</td><td class="l">'+(r.sec||'<span style="color:var(--ink3)">—</span>')+'</td>'+P5.map(p=>cell(r,p)).join('')+'<td>'+f1(r.AUT)+'</td><td class="l">'+tag(r.win)+'</td><td class="'+cur('gap').trim()+'">'+f1(r.gap)+' pts<span class="sub" style="text-align:right">'+n0(r.gapV)+(r.gapV>1?' votes':' vote')+'</span></td><td>'+n0(r.tv)+'</td><td>'+n0(r.br)+'</td><td>'+(r.ins==null?'—':n0(r.ins))+'</td><td>'+(r.part==null?'—':f1(r.part)+' %')+'</td></tr>').join('')+
    (rows.length>1&&at?'<tr class="tot"><td>Total<span class="ty2">'+rows.length+' bureaux</span></td><td></td>'+P5.map(p=>'<td'+(p===ME?' style="color:var(--bq)"':'')+'>'+f1(100*agg[p]/at)+' %<span class="sub" style="text-align:right">'+n0(agg[p])+'</span></td>').join('')+'<td>'+f1(100*agg.AUT/at)+'</td><td class="l">'+tag(win(agg))+'</td><td></td><td>'+n0(at)+'</td><td>'+n0(abr)+'</td><td>'+(tIns?n0(tIns):'—')+'</td><td>'+(tPart?f1(tPart)+' %':'—')+'</td></tr>':'')+'</tbody></table></div>'+
@@ -264,7 +267,7 @@ function renderTab(){const el=$('tab');
   el.querySelector('#csv').onclick=()=>copyCSV([['bureau','type',secLab().toLowerCase(),...PO.map(p=>p+'_pct'),...PO.map(p=>p+'_votes'),'en_tete','ecart_pts','ecart_votes','bulletins_valides','bulletins_rejetes','electeurs_inscrits','participation']].concat(rows.map(r=>[r.lab,r.typ,r.sec,...PO.map(p=>r[p].toFixed(1)),...PO.map(p=>r.v[p]||0),r.win,r.gap.toFixed(1),r.gapV,r.tv,r.br,r.ins,r.part==null?'':r.part.toFixed(1)])));}
  else if(TAB==='sec'){const rows=secRows(),S=SSORT;rows.sort((a,b)=>{const x=a[S.k],y=b[S.k];return (typeof x==='string'?x.localeCompare(y,'fr',{numeric:true}):((x==null?-99:x)-(y==null?-99:y)))*S.d;});
   const mx=Math.max(...rows.map(r=>r.bt),1),T={};PO.forEach(p=>T[p]=rows.reduce((s,r)=>s+r.t[p],0));const TT=tot(T)||1;
-  el.innerHTML='<div class="ctrl"><span class="lab">'+rows.length+' '+(secLab()==='Municipalité'?'municipalités':'secteurs électoraux')+' · jour du scrutin et anticipation · '+YR[YK].yr+'</span><button class="btn" id="csv">Copier le tableau (CSV)</button></div>'+
+  el.innerHTML='<div class="ctrl"><span class="lab">'+rows.length+' '+(secLab()==='Municipalité'?'municipalités':'secteurs électoraux')+' · jour du scrutin et anticipation · '+YR[YK].yr+'</span><button class="btn" id="csv">Copier le tableau (CSV)</button><button class="btn" onclick="window.print()">Imprimer</button></div>'+
    '<div class="tw"><table><thead><tr>'+th('nm',secLab(),S,'l')+th('n','Sections',S)+th('ins','Inscrits',S)+th('tt','Votes',S)+th('win','En tête',S,'l')+th('bt',NM+' % (total)',S,'l')+th('bj',NM+' % jour',S)+th('ba',NM+' % anticip.',S)+th('rv',AB[VP]+' %',S)+th('vn',NM+' − '+AB[VP],S)+(YK===CUR?th('dv',NM+' depuis '+(EVS.length?EVS[0][1]:''),S):'')+'</tr></thead><tbody>'+
    rows.map(r=>'<tr data-sec="'+r.code+'"'+(FILT.sec===r.code?' style="background:rgba(61,143,232,.1)"':'')+'><td>'+r.nm+'</td><td>'+r.n+'</td><td>'+n0(r.ins)+'</td><td>'+n0(r.tt)+'</td><td class="l">'+tag(r.win)+'</td><td class="l"><span class="bar1" style="width:'+(70*r.bt/mx)+'px"></span><b style="color:var(--bq)">'+f1(r.bt)+' %</b></td><td>'+f1(r.bj)+'</td><td>'+f1(r.ba)+'</td><td>'+f1(r.rv)+'</td><td class="'+(r.vn>0?'up':'dn')+'">'+(r.vn>0?'+':'')+f1(r.vn)+'</td>'+(YK===CUR?'<td class="'+(r.dv>=0?'up':'dn')+'">'+(r.dv==null?'—':(r.dv>=0?'+':'')+f1(r.dv)+' pts')+'</td>':'')+'</tr>').join('')+
    '<tr class="tot"><td>Ensemble</td><td>'+rows.reduce((s,r)=>s+r.n,0)+'</td><td>'+n0(rows.reduce((s,r)=>s+r.ins,0))+'</td><td>'+n0(TT)+'</td><td class="l">'+tag(win(T))+'</td><td class="l"><b>'+f1(100*T[ME]/TT)+' %</b></td><td></td><td></td><td>'+f1(100*T[VP]/TT)+'</td><td>'+(T[ME]>T[VP]?'+':'')+f1(100*(T[ME]-T[VP])/TT)+'</td>'+(YK===CUR?'<td></td>':'')+'</tr></tbody></table></div>'+
@@ -276,7 +279,7 @@ function renderTab(){const el=$('tab');
   const ins=rows.reduce((s,r)=>s+r.ins,0),on=FILT.tg===TG.k;
   el.innerHTML='<div class="ctrl"><span class="lab">Critère</span><select id="tgk">'+tgs.map(k=>'<option value="'+k+'"'+(k===TG.k?' selected':'')+'>'+(k==='close'?LEM+' à moins de N points du premier':TGT[k].t)+'</option>').join('')+'</select>'+
    (TG.k==='close'?'<span class="lab">N =</span><select id="tgn">'+[5,10,15,20,25].map(n=>'<option'+(n===TG.n?' selected':'')+'>'+n+'</option>').join('')+'</select>':'')+
-   '<button class="btn" id="tgmap">'+(on?'Retirer de la carte':'Afficher ces sections sur la carte')+'</button><button class="btn" id="csv">Copier la liste (CSV)</button></div>'+
+   '<button class="btn" id="tgmap">'+(on?'Retirer de la carte':'Afficher ces sections sur la carte')+'</button><button class="btn" id="csv">Copier la liste (CSV)</button><button class="btn" onclick="window.print()">Imprimer</button></div>'+
    '<p class="note" style="margin:0 0 12px"><b style="color:var(--ink)">'+rows.length+' sections</b>'+(FILT.sec?' ('+FILT.sec+')':'')+' · <b style="color:var(--ink)">'+n0(ins)+' électeurs inscrits</b> au total. Résultats du jour du scrutin '+YR[YK].yr+', triés par nombre d’inscrits : les plus grosses d’abord.</p>'+
    (rows.length?'<div class="tw"><table><thead><tr><th class="l">#</th>'+th('lab','Section',S,'l')+th('sec',secLab(),S,'l')+th('ins','Inscrits',S)+th('me',NM+' %',S)+th('win','En tête',S,'l')+th('gap','Écart '+DUM+'',S)+'</tr></thead><tbody>'+
    rows.map((r,i)=>'<tr data-k="'+r.k+'"><td class="l ty">'+(i+1)+'</td><td>'+r.lab+'</td><td class="l">'+r.sec+'</td><td>'+n0(r.ins)+'</td>'+pc(r.me,1)+'<td class="l">'+tag(r.win)+'</td><td class="'+(r.gap>=0?'up':'dn')+'">'+(r.gap>=0?'+':'')+f1(r.gap)+' pts</td></tr>').join('')+'</tbody></table></div>':'<p class="note">Aucune section ne répond à ce critère.</p>');
@@ -354,3 +357,28 @@ function locate(){const u=new URLSearchParams(location.search),la=parseFloat(u.g
  if(f){$('mapcard').scrollIntoView({behavior:'smooth',block:'start'});map.setView([la,lo],16);setTimeout(()=>BYN[CUR][f.properties.k].openPopup([la,lo]),700);return;}
  const alt=(u.get('alt')||'').split(',').filter(Boolean);if(alt.length){u.set('alt',alt.slice(1).join(','));location.href='../'+alt[0]+'/?'+u.toString();return;}
  map.setView([la,lo],15);toast('Adresse hors des sections de cette circonscription.');}
+
+/* ---------- terrain : position GPS en continu, lien direct vers une section, itinéraire ---------- */
+function shareSec(k){const u=location.origin+location.pathname+'?s='+encodeURIComponent(k);
+ (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>toast('Lien de la section '+lab(k)+' copié.'),()=>{prompt('Lien de la section',u);});}
+const HERE=document.createElement('div');HERE.className='here';$('mapwrap').appendChild(HERE);
+let GW=null,GM=null,GA=null,GK=null,GFIRST=true;
+function secAt(la,lo){const f=DATA[CUR].fc.features.find(f=>inGeom(lo,la,f.geometry));return f?f.properties.k:null;}
+function gpsStop(){if(GW!=null)navigator.geolocation.clearWatch(GW);GW=null;if(GM)map.removeLayer(GM);if(GA)map.removeLayer(GA);GM=GA=null;GK=null;GPSB.classList.remove('on');HERE.classList.remove('on');}
+function gpsStart(){if(!navigator.geolocation){toast('La géolocalisation n’est pas offerte par ce navigateur.');return;}
+ if(YK!==CUR)setYear(CUR);GFIRST=true;GPSB.classList.add('on');toast('Recherche de votre position…');
+ GW=navigator.geolocation.watchPosition(p=>{const la=p.coords.latitude,lo=p.coords.longitude,ll=[la,lo];
+  if(!GM){GM=L.marker(ll,{icon:L.divIcon({className:'',html:'<div class="gpsdot"></div>',iconSize:[16,16],iconAnchor:[8,8]}),interactive:false,zIndexOffset:1000}).addTo(map);GA=L.circle(ll,{radius:p.coords.accuracy,color:'#4ea1ff',weight:1,fillOpacity:.08,interactive:false}).addTo(map);}
+  else{GM.setLatLng(ll);GA.setLatLng(ll).setRadius(p.coords.accuracy);}
+  const k=secAt(la,lo);
+  if(k!==GK){GK=k;
+   if(k){const d=DAY()[k];HERE.innerHTML='<span>Vous êtes dans la <b>section '+lab(k)+'</b>'+(d&&!isReg(d)?' · '+NM+' '+f1(pct(d,ME))+' %':(d&&d.regr?' (comptée avec la section '+lab(d.regr)+')':''))+'</span><button class="btn" id="herego">Fiche</button>';
+    HERE.classList.add('on');$('herego').onclick=()=>BYN[CUR][k].openPopup(ll);}
+   else{HERE.innerHTML='<span>Vous êtes hors des sections de cette circonscription.</span><button class="btn" id="herego">Arrêter</button>';HERE.classList.add('on');$('herego').onclick=gpsStop;}}
+  if(GFIRST){GFIRST=false;map.setView(ll,Math.max(map.getZoom(),16));}
+ },e=>{gpsStop();toast(e.code===1?'Accès à la position refusé : autorisez-le dans le navigateur.':'Position introuvable pour le moment.');},{enableHighAccuracy:true,maximumAge:5000,timeout:20000});}
+const GPSB=L.DomUtil.create('div','leaflet-bar gpsb');
+(function(){const C=L.Control.extend({options:{position:'topright'},onAdd(){GPSB.innerHTML='<a href="#" role="button" title="Me localiser (suivi en continu)" aria-label="Me localiser"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></a>';
+ L.DomEvent.disableClickPropagation(GPSB);GPSB.firstChild.onclick=e=>{e.preventDefault();GW==null?gpsStart():gpsStop();};return GPSB;}});new C().addTo(map);})();
+(function(){const s=new URLSearchParams(location.search).get('s');if(s&&BYN[CUR]&&BYN[CUR][s])setTimeout(()=>{if(YK!==CUR)setYear(CUR);goto(s);},500);})();
+map.on('popupopen',()=>$('mapwrap').classList.add('pop'));map.on('popupclose',()=>$('mapwrap').classList.remove('pop'));

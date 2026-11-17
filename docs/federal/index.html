@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/site.css?v=202611171341">
+<link rel="stylesheet" href="../assets/site.css?v=202611171412">
 <style>:root{--bq:#3fb6e8}</style>
 <style>
 .hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px;align-items:end;margin-bottom:22px}
@@ -102,7 +102,7 @@ const hval=c=>HQ==='pq'?pct(c.v,ME):HQ==='gap'?gapPQ(c):progPQ(c);
 const hfill=c=>{if(HQ==='win')return PC[win(c.v)];const v=hval(c);return v==null?'#2a313c':HQS[HQ].bins.find(b=>v>=b[0])[1];};
 const map=L.map('hmap',{zoomControl:false,minZoom:4,maxZoom:12}).setView([47.5,-71.5],5);
 L.control.zoom({position:'topright'}).addTo(map);
-L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{maxNativeZoom:16,attribution:'Fond : Esri · Données : Élections Québec'}).addTo(map);
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{maxNativeZoom:16,attribution:'Fond : Esri · Données : Élections Canada'}).addTo(map);
 let LAY,BYC={};
 function style(f){const c=BYC[f.properties.c];const on=!REG||c.r===REG;return{color:on?'#e3eaf2':'#2a3343',weight:on?.9:.4,opacity:on?.7:.5,fillColor:on?hfill(c):'#151b24',fillOpacity:on?.78:.35};}
 function popup(c){const v=c.v,w=win(v),rk=rankOf(v,ME),g=gapPQ(c),pr=progPQ(c);
@@ -162,7 +162,7 @@ async function searchAddr(){const q=$('adr').value.trim();if(q.length<4)return;$
  catch(e){$('adrres').innerHTML='<span class="hint">Le service d’adresses ne répond pas. Choisissez plutôt votre région et votre circonscription ci-dessous.</span>';}}
 $('adrgo').onclick=searchAddr;$('adr').onkeydown=e=>{if(e.key==='Enter')searchAddr();};
 document.querySelectorAll('#htabs button').forEach(b=>b.onclick=()=>{HT=b.dataset.t;renderTab();});
-fetch('accueil.json?v=202611171341').then(r=>r.json()).then(d=>{N=d;N.circ.forEach(c=>BYC[c.c]=c);
+fetch('accueil.json?v=202611171412').then(r=>r.json()).then(d=>{N=d;N.circ.forEach(c=>BYC[c.c]=c);
  $('parts').innerHTML=N.circ.filter(c=>c.bq26).map(c=>'<a class="btn" style="text-decoration:none" href="'+c.s+'/"><b>'+c.n+'</b> · '+c.bq26+' pour le Bloc</a>').join('');
  const rk=Object.keys(N.regions).sort((a,b)=>N.regions[a].localeCompare(N.regions[b],'fr'));
  $('regs').innerHTML='<button data-r="">Tout le Québec<small>'+N.circ.length+'</small></button>'+rk.map(r=>'<button data-r="'+r+'">'+N.regions[r]+'<small>'+N.circ.filter(c=>c.r===r).length+'</small></button>').join('');
