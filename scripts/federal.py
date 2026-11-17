@@ -22,7 +22,7 @@ def parti(fr):
     return 'AUT'
 
 def base(p):
-    return re.sub(r'[A-Z]+$', '', p)
+    return re.sub(r'[A-Z]+$', '', p.split('-')[0])
 
 def lire(annee, fed):
     rows = list(csv.reader(open(f'{X}/r{annee}/{fed}.csv', encoding='utf-8-sig')))[1:]

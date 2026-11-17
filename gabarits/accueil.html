@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Atlas électoral du Québec</title>
+<title>Provincial · Atlas électoral du Québec</title>
 <meta name="description" content="Résultats des élections générales québécoises de 2018, 2022 et 2026, région par région et section de vote par section de vote, lus du point de vue du Parti Québécois.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%233d8fe8'/%3E%3Cpath d='M8 22V10h6a4 4 0 010 8H8' stroke='%23fff' stroke-width='3' fill='none'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/site.css?v=__V__">
+<link rel="stylesheet" href="../assets/site.css?v=__V__">
 <style>
 .hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px;align-items:end;margin-bottom:22px}
 .hero>*{min-width:0}.hero h1{overflow-wrap:anywhere}
@@ -35,11 +35,11 @@ td a{color:var(--ink);text-decoration:none}td a:hover{text-decoration:underline}
 </head>
 <body>
 <div class="wrap">
- <div class="kick">Élections générales québécoises · 2018 · 2022 · 2026</div>
+ <div class="kick"><a href="../">Atlas électoral du Québec</a> › Provincial · élections de 2018, 2022 et 2026</div>
  <div class="hero">
-  <div><h1>Atlas électoral du Québec</h1>
+  <div><h1>Le Québec au provincial</h1>
    <p>Les résultats des trois dernières élections générales, région par région, circonscription par circonscription et section de vote par section de vote, lus du point de vue du Parti Québécois. <span class="by">Outil conçu par <b>Louis Morin Payette</b>.</span></p>
-   <p><a class="pill" style="text-decoration:none;display:inline-block;margin-top:4px" href="federal/">Nouveau · Partielles fédérales du 7 décembre 2026 (Bloc) →</a></p></div>
+   <p><a class="pill" style="text-decoration:none;display:inline-block;margin-top:4px" href="../federal/">Voir le fédéral (Bloc) →</a></p></div>
   <div class="adr"><div class="lab">Comment a voté votre quartier ?</div>
    <div class="row"><input id="adr" placeholder="Tapez une adresse, ex. 25 rue Wolfe, Lévis" autocomplete="off" aria-label="Adresse"><button class="btn" id="adrgo">Chercher</button></div>
    <div class="res" id="adrres"></div><div class="hint">L’adresse est envoyée au service de géolocalisation du gouvernement du Québec (Adresses Québec) pour être placée sur la carte. Elle n’est pas conservée par cet outil.</div></div>
@@ -106,7 +106,7 @@ function style(f){const c=BYC[f.properties.c];const on=!REG||c.r===REG;return{co
 function popup(c){const v=c.v,w=win(v),rk=rankOf(v,ME),g=gapPQ(c),pr=progPQ(c);
  let h='<div class="pp"><h3>'+c.n+'</h3><div class="m">'+N.regions[c.r]+' · '+n0(c.el)+' électeurs inscrits</div><div class="big">Personne élue : '+tag(w)+' <b>'+c.elu+'</b>.<br>Le PQ arrive <b>'+ord(rk)+'</b> avec <b>'+f1(pct(v,ME))+' %</b>'+(rk===1?', '+f1(g)+' points d’avance.':', à '+f1(-g)+' points du premier.')+(pr!=null?' Depuis 2022 : <b>'+(pr>=0?'+':'')+f1(pr)+' points</b>.':'')+'</div>';
  PO.filter(p=>pct(v,p)>=1.5).sort((a,b)=>v[b]-v[a]).forEach(p=>{const x=pct(v,p);h+='<div class="pb'+(p===ME?' me':'')+'"><span class="nm">'+PL[p]+'</span><span class="tr"><i style="width:'+Math.min(100,x/60*100)+'%;background:'+PC[p]+'"></i></span><span class="pc">'+f1(x)+' %</span></div>';});
- return h+'<a class="go" href="circonscription/'+c.s+'/">Ouvrir la circonscription →</a></div>';}
+ return h+'<a class="go" href="../circonscription/'+c.s+'/">Ouvrir la circonscription →</a></div>';}
 function legRow(col,name,sub,n){return '<div class="lr"><i style="background:'+col+'"></i><span><b>'+name+'</b>'+(sub?' <span style="color:var(--ink3)">· '+sub+'</span>':'')+'</span><span class="n">'+n+'</span></div>';}
 function renderSide(){$('hq').innerHTML=Object.keys(HQS).map(k=>'<button class="qb'+(k===HQ?' on':'')+'" data-q="'+k+'"><span class="rd"></span><span><b>'+HQS[k].t+'</b><small>'+HQS[k].s+'</small></span></button>').join('');
  document.querySelectorAll('#hq .qb').forEach(b=>b.onclick=()=>{HQ=b.dataset.q;LAY.setStyle(style);renderSide();});
@@ -115,7 +115,7 @@ function renderSide(){$('hq').innerHTML=Object.keys(HQS).map(k=>'<button class="
  else{const B=HQS[HQ].bins,n=B.map(()=>0);S.forEach(c=>{const v=hval(c);if(v!=null)n[B.indexOf(B.find(b=>v>=b[0]))]++;});B.forEach((b,i)=>lg+=legRow(b[1],b[2],b[3],n[i]));}
  $('hleg').innerHTML=lg;
  const won=S.filter(c=>win(c.v)===ME).length,close=S.filter(c=>win(c.v)!==ME&&gapPQ(c)>-5).length,frag=S.filter(c=>win(c.v)===ME&&gapPQ(c)<5).length;
- $('htake').innerHTML='<b>À retenir.</b> '+(REG?'Dans la région '+N.regions[REG]:'Au Québec')+', le PQ a remporté <b>'+won+' circonscription'+(won>1?'s':'')+' sur '+S.length+'</b> en 2026. '+(frag?frag+' de ces victoires se sont jouées à moins de 5 points. ':'')+(close?'Le PQ a perdu '+close+' circonscription'+(close>1?'s':'')+' par moins de 5 points.':'');}
+ $('htake').innerHTML='<b>À retenir.</b> '+(REG?'Dans la région '+N.regions[REG]:'Au Québec')+', le PQ a remporté <b>'+won+' circonscription'+(won>1?'s':'')+' sur '+S.length+'</b> en 2026. '+(frag?(frag>1?frag+' de ces victoires se sont jouées':'Une de ces victoires s’est jouée')+' à moins de 5 points. ':'')+(close?'Le PQ a perdu '+close+' circonscription'+(close>1?'s':'')+' par moins de 5 points.':'');}
 function renderSum(){const S=SEL(),v={},v22={},v18={};S.forEach(c=>PO.forEach(p=>{v[p]=(v[p]||0)+c.v[p];if(c.y22)v22[p]=(v22[p]||0)+c.y22[p];if(c.y18)v18[p]=(v18[p]||0)+c.y18[p];}));
  const seats={};S.forEach(c=>{const w=win(c.v);seats[w]=(seats[w]||0)+1;});
  const el=S.reduce((s,c)=>s+c.el,0),vo=S.reduce((s,c)=>s+c.valid+c.rej,0);
@@ -135,10 +135,10 @@ function renderTab(){const el=$('htab');document.querySelectorAll('#htabs button
  else S.sort((a,b)=>{const x=a[CS.k],y=b[CS.k];if(x==null||y==null)return (x==null)-(y==null);return (typeof x==='string'?x.localeCompare(y,'fr'):x-y)*CS.d;});
  el.innerHTML=(HT==='cl'?'<p class="note" style="margin:0 0 12px">Circonscriptions où l’écart entre le PQ et le premier (ou le deuxième, quand le PQ est élu) est de moins de 10 points'+(REG?' dans la région '+N.regions[REG]:'')+' : '+S.length+'.</p>':'')+
   '<div class="tw"><table><thead><tr>'+th('n','Circonscription','l')+'<th class="l">Personne élue en 2026</th>'+th('pq','PQ 2026')+th('rk','Place du PQ')+th('gap','Écart du PQ')+th('pr','PQ depuis 2022')+th('p18','PQ depuis 2018')+th('part','Participation')+'<th class="l">Candidature du PQ</th></tr></thead><tbody>'+
-  S.map(x=>'<tr data-s="'+x.c.s+'"><td><a href="circonscription/'+x.c.s+'/">'+x.n+'</a>'+(REG?'':'<span class="sub">'+N.regions[x.c.r]+'</span>')+'</td><td class="l">'+tag(x.w)+' '+x.c.elu+'</td><td style="color:var(--bq);font-weight:600">'+f1(x.pq)+' %</td><td>'+ord(x.rk)+'</td><td class="'+(x.gap>=0?'up':'dn')+'">'+(x.gap>=0?'+':'')+f1(x.gap)+' pts</td><td class="'+(x.pr>=0?'up':'dn')+'">'+(x.pr==null?'—':(x.pr>=0?'+':'')+f1(x.pr)+' pts')+'</td><td class="'+(x.p18>=0?'up':'dn')+'">'+(x.p18==null?'—':(x.p18>=0?'+':'')+f1(x.p18)+' pts')+'</td><td>'+f1(x.part)+' %</td><td class="l" style="color:var(--ink2)">'+(x.c.cand.PQ||'—')+'</td></tr>').join('')+'</tbody></table></div>'+
+  S.map(x=>'<tr data-s="'+x.c.s+'"><td><a href="../circonscription/'+x.c.s+'/">'+x.n+'</a>'+(REG?'':'<span class="sub">'+N.regions[x.c.r]+'</span>')+'</td><td class="l">'+tag(x.w)+' '+x.c.elu+'</td><td style="color:var(--bq);font-weight:600">'+f1(x.pq)+' %</td><td>'+ord(x.rk)+'</td><td class="'+(x.gap>=0?'up':'dn')+'">'+(x.gap>=0?'+':'')+f1(x.gap)+' pts</td><td class="'+(x.pr>=0?'up':'dn')+'">'+(x.pr==null?'—':(x.pr>=0?'+':'')+f1(x.pr)+' pts')+'</td><td class="'+(x.p18>=0?'up':'dn')+'">'+(x.p18==null?'—':(x.p18>=0?'+':'')+f1(x.p18)+' pts')+'</td><td>'+f1(x.part)+' %</td><td class="l" style="color:var(--ink2)">'+(x.c.cand.PQ||'—')+'</td></tr>').join('')+'</tbody></table></div>'+
   '<p class="note">Écart du PQ : positif quand le PQ est élu (avance sur le deuxième), négatif quand il ne l’est pas (retard sur le premier). Les variations depuis 2022 et 2018 sont calculées sur les limites de 2026 (estimation).</p>';
  el.querySelectorAll('th[data-s]').forEach(t=>t.onclick=()=>{const k=t.dataset.s;CS=CS.k===k?{k,d:-CS.d}:{k,d:(k==='n'||k==='rk')?1:-1};renderTab();});
- el.querySelectorAll('tr[data-s]').forEach(t=>t.onclick=e=>{if(e.target.tagName!=='A')location.href='circonscription/'+t.dataset.s+'/';});}
+ el.querySelectorAll('tr[data-s]').forEach(t=>t.onclick=e=>{if(e.target.tagName!=='A')location.href='../circonscription/'+t.dataset.s+'/';});}
 function setReg(r,scroll){REG=r;try{history.replaceState(null,'',r?'#r='+r:location.pathname);}catch(e){}
  document.querySelectorAll('#regs button').forEach(b=>b.classList.toggle('on',b.dataset.r===r));$('rsel').value=r;
  if(HT==='r')HT='c';LAY.setStyle(style);renderSum();renderSide();renderTab();
@@ -150,7 +150,7 @@ function inRing(x,y,r){let c=false;for(let i=0,j=r.length-1;i<r.length;j=i++){co
 function dist(x,y,g){const ps=g.type==='Polygon'?[g.coordinates]:g.coordinates;let best=1e9;for(const p of ps){if(inRing(x,y,p[0])&&!p.slice(1).some(h=>inRing(x,y,h)))return 0;for(const r of p)for(const [a,b] of r){const d=Math.hypot((a-x)*Math.cos(y*Math.PI/180),b-y);if(d<best)best=d;}}return best;}
 function goAddr(lon,lat,label){const c=N.fc.features.map(f=>({c:BYC[f.properties.c],d:dist(lon,lat,f.geometry)})).filter(x=>x.d<.03).sort((a,b)=>a.d-b.d);
  if(!c.length){toast('Cette adresse ne semble pas être au Québec.');return;}
- location.href='circonscription/'+c[0].c.s+'/?lat='+lat.toFixed(6)+'&lng='+lon.toFixed(6)+'&adr='+encodeURIComponent(label)+(c.length>1?'&alt='+c.slice(1,4).map(x=>x.c.s).join(','):'');}
+ location.href='../circonscription/'+c[0].c.s+'/?lat='+lat.toFixed(6)+'&lng='+lon.toFixed(6)+'&adr='+encodeURIComponent(label)+(c.length>1?'&alt='+c.slice(1,4).map(x=>x.c.s).join(','):'');}
 async function searchAddr(){const q=$('adr').value.trim();if(q.length<4)return;$('adrres').innerHTML='<span class="hint">Recherche…</span>';
  try{const u='https://geoegl.msp.gouv.qc.ca/apis/icherche/geocode?type=adresses&limit=5&geometry=true&q='+encodeURIComponent(q);
   const j=await fetch(u).then(r=>r.json());const fs=(j.features||[]).filter(f=>f.geometry);
@@ -160,7 +160,7 @@ async function searchAddr(){const q=$('adr').value.trim();if(q.length<4)return;$
  catch(e){$('adrres').innerHTML='<span class="hint">Le service d’adresses ne répond pas. Choisissez plutôt votre région et votre circonscription ci-dessous.</span>';}}
 $('adrgo').onclick=searchAddr;$('adr').onkeydown=e=>{if(e.key==='Enter')searchAddr();};
 document.querySelectorAll('#htabs button').forEach(b=>b.onclick=()=>{HT=b.dataset.t;renderTab();});
-fetch('assets/quebec.json?v=__V__').then(r=>r.json()).then(d=>{N=d;N.circ.forEach(c=>BYC[c.c]=c);
+fetch('../assets/quebec.json?v=__V__').then(r=>r.json()).then(d=>{N=d;N.circ.forEach(c=>BYC[c.c]=c);
  const rk=Object.keys(N.regions).sort((a,b)=>N.regions[a].localeCompare(N.regions[b],'fr'));
  $('regs').innerHTML='<button data-r="">Tout le Québec<small>'+N.circ.length+'</small></button>'+rk.map(r=>'<button data-r="'+r+'">'+N.regions[r]+'<small>'+N.circ.filter(c=>c.r===r).length+'</small></button>').join('');
  $('rsel').innerHTML='<option value="">Tout le Québec</option>'+rk.map(r=>'<option value="'+r+'">'+N.regions[r]+'</option>').join('');

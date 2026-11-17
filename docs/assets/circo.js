@@ -88,7 +88,7 @@ function style(f){const k=f.properties.k,d=R()[k];
  return{color:SEE?'#ffffff':'#e3eaf2',weight:SEE?1.8:1,dashArray:null,fillColor:fillR(k),fillOpacity:SEE?.28:.7,opacity:SEE?.95:.55};}
 /* ---------- panneau de résultats ---------- */
 function renderRes(){const c=C(),r=c.res,y=YR[YK];
- $('kick').innerHTML=DATA.crumb?DATA.crumb+' › '+y.t:'<a href="../../">Atlas électoral du Québec</a> › <a href="../../#r='+DATA.reg+'">'+DATA.regn+'</a> › '+y.t;
+ $('kick').innerHTML=DATA.crumb?DATA.crumb+' › '+y.t:'<a href="../../">Atlas électoral du Québec</a> › <a href="../../provincial/#r='+DATA.reg+'">Provincial · '+DATA.regn+'</a> › '+y.t;
  if(!r.trans){const cl=r.cand,tv=r.valid;
   $('resT').textContent='Résultat officiel · '+y.yr;
   $('cand').innerHTML=cl.filter(x=>x[2]/tv>=.004).map(([p,n,v])=>'<div class="cr'+(p===ME?' me':'')+'"><span class="nm">'+n+'<small>'+(p==='AUT'?'autre':AB[p])+'</small></span><span class="pc">'+f1(100*v/tv)+' %<small>'+n0(v)+' votes</small></span><span class="tr"><i style="width:'+(100*v/cl[0][2])+'%;background:'+PC[p]+'"></i></span></div>').join('');

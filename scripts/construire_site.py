@@ -45,6 +45,7 @@ for c, p in P.items():
     circ.append(row)
 NAT = {'regions': P[next(iter(P))]['regn'] and {p['reg']: p['regn'] for p in P.values()}, 'circ': sorted(circ, key=lambda x: x['n']),
        'fc': {'type': 'FeatureCollection', 'features': feats}}
-open(f'{DOCS}/index.html', 'w', encoding='utf-8').write(open(f'{GAB}/accueil.html', encoding='utf-8').read().replace('__V__', V))
+os.makedirs(f'{DOCS}/provincial', exist_ok=True)
+open(f'{DOCS}/provincial/index.html', 'w', encoding='utf-8').write(open(f'{GAB}/accueil.html', encoding='utf-8').read().replace('__V__', V))
 open(f'{DOCS}/assets/quebec.json', 'w', encoding='utf-8').write(json.dumps(NAT, separators=(',', ':'), ensure_ascii=False))
 print('pages', len(P), 'accueil', os.path.getsize(f'{DOCS}/assets/quebec.json') // 1000, 'Ko', 'version', V)

@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>__NOM__ · Partielle fédérale · Atlas électoral du Québec</title>
-<meta name="description" content="Résultats fédéraux de 2021 et 2025 par section de vote dans __NOM__, lus du point de vue du Bloc Québécois, en vue de l'élection partielle du 7 décembre 2026.">
+<title>__NOM__ · Fédéral · Atlas électoral du Québec</title>
+<meta name="description" content="Résultats fédéraux de 2021 et 2025 par section de vote dans __NOM__, lus du point de vue du Bloc Québécois.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%233d8fe8'/%3E%3Cpath d='M8 22V10h6a4 4 0 010 8H8' stroke='%23fff' stroke-width='3' fill='none'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,8 +18,8 @@
  <h1>__NOM__</h1>
  <div class="bar">
   <div class="seg" id="years"></div>
-  <label class="nav-c">Autres partielles <select id="navc" onchange="if(this.value)location.href='../'+this.value+'/'">__NAV__</select></label>
-  <span class="pill">Élection partielle le 7 décembre 2026 · __BQC__ pour le Bloc</span>
+  <label class="nav-c">Circonscriptions de la région <select id="navc" onchange="if(this.value)location.href='../'+this.value+'/'">__NAV__</select></label>
+__PILL__
   <span class="by">Outil conçu par <b>Louis Morin Payette</b></span>
  </div>
 
@@ -71,7 +71,7 @@
   <div><b>Type de vote.</b> Le vote par anticipation est publié par bureau de vote par anticipation (BVA), qui regroupe plusieurs sections. En mode « Anticipation », chaque section prend la couleur de son BVA. Les votes spéciaux (bulletins spéciaux, électeurs à l'étranger, etc.) n'ont pas de territoire : ils sont seulement dans le tableau.</div>
   <div><b>Zones hachurées :</b> petites sections (bureaux itinérants, résidences) dont les votes sont comptés avec une autre section. <b>Évolution :</b> les résultats de 2021 sont estimés sur chaque section de 2025 en répartissant les votes des anciennes sections selon la part de leur territoire habité qui s'y trouve.</div>
  </div>
- <footer>Données : Élections Canada, résultats officiels par bureau de vote des élections générales de 2021 et 2025 et limites des sections de vote. Secteurs à Montréal : quartiers de référence de la Ville de Montréal (données ouvertes). Les comparaisons entre élections sont des estimations calculées par l'outil, et non des données officielles. Fond de carte : Esri. Outil conçu par <b style="color:var(--ink2)">Louis Morin Payette</b>, avec l'aide de Claude, un modèle d'intelligence artificielle d'Anthropic. <a href="../">Toutes les partielles</a> · <a href="../../">Atlas électoral du Québec</a>.</footer>
+ <footer>Données : Élections Canada, résultats officiels par bureau de vote des élections générales de 2021 et 2025 et limites des sections de vote. Secteurs à Montréal : quartiers de référence de la Ville de Montréal (données ouvertes). Les comparaisons entre élections sont des estimations calculées par l'outil, et non des données officielles. Fond de carte : Esri. Outil conçu par <b style="color:var(--ink2)">Louis Morin Payette</b>, avec l'aide de Claude, un modèle d'intelligence artificielle d'Anthropic. <a href="../">Toutes les circonscriptions fédérales</a> · <a href="../../">Atlas électoral du Québec</a>.</footer>
 </div>
 <div class="toast" id="toast"></div>
 <script id="data" type="application/json">__DATA__</script>
