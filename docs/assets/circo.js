@@ -81,12 +81,13 @@ function prepQ(){const D=R(),O=ORDall();
  QUES.par.bins=quint(O.map(k=>pct(D[k],PP)),ramp(PC[PP]),x=>x+' %');
  QUES.part.bins=quint(O.map(partK),ramp('#d9b44a'),x=>x+' %');}
 function fillR(k){const d=R()[k];if(Q==='win'){const w=win(d),m=pct(d,w)-pct(d,second(d));return mix(PC[w],'#0b0d12',Math.max(0,Math.min(.6,(15-m)/15*.6)));}if(!QUES[Q].bins)return '#2a313c';const v=val(k);return v==null?'#2a313c':binOf(QUES[Q],v)[1];}
+function ZOP(){const z=typeof map!=='undefined'?map.getZoom():12;return z<=13?.85:z===14?.74:z===15?.6:.5;}
 function style(f){const k=f.properties.k,d=R()[k];
- const lo=SEE||SAT;
+ const lo=SEE||SAT,zo=ZOP();
  if(fActive()&&!match(k))return{color:'#0b0d12',weight:.6,dashArray:null,fillColor:'#151b24',fillOpacity:lo?.06:.35,opacity:.6};
- if(isReg(d))return{color:lo?'#ffffff':'#0b0d12',weight:lo?1:.7,dashArray:null,fillColor:'#2b313c',fillOpacity:lo?.12:.75,opacity:lo?.5:.9};
- if(FILT.ty==='anti')return{color:'#0b0d12',weight:.5,dashArray:null,fillColor:fillR(k),fillOpacity:lo?.32:.82,opacity:.6};
- return{color:lo?'#ffffff':'#0b0d12',weight:lo?1.4:.8,dashArray:null,fillColor:fillR(k),fillOpacity:lo?.32:.84,opacity:lo?.85:.9};}
+ if(isReg(d))return{color:lo?'#ffffff':'#0b0d12',weight:lo?1:.7,dashArray:null,fillColor:'#3a414d',fillOpacity:lo?.12:.4,opacity:lo?.5:.9};
+ if(FILT.ty==='anti')return{color:'#0b0d12',weight:.5,dashArray:null,fillColor:fillR(k),fillOpacity:lo?.32:zo,opacity:.6};
+ return{color:lo?'#ffffff':'#0b0d12',weight:lo?1.4:.8,dashArray:null,fillColor:fillR(k),fillOpacity:lo?.32:zo,opacity:lo?.85:.9};}
 /* ---------- panneau de résultats ---------- */
 function renderRes(){const c=C(),r=c.res,y=YR[YK];
  $('kick').innerHTML=DATA.crumb?DATA.crumb+' › '+y.t:'<a href="../../">Atlas électoral du Québec</a> › <a href="../../provincial/#r='+DATA.reg+'">Provincial · '+DATA.regn+'</a> › '+y.t;
@@ -112,14 +113,13 @@ const map=L.map('map',{zoomControl:false,minZoom:5,maxZoom:17,attributionControl
 L.control.zoom({position:'topright'}).addTo(map);
 const ERR='data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 const ESRI='https://server.arcgisonline.com/ArcGIS/rest/services/';
-const CARTO='https://{s}.basemaps.cartocdn.com/';
-const BASE_PLAN=L.tileLayer(CARTO+'dark_nolabels/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19,errorTileUrl:ERR,attribution:'Fond : © OpenStreetMap · © CARTO · Données : '+CFG.org}).addTo(map);
+const BASE_PLAN=L.tileLayer(ESRI+'Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{maxNativeZoom:16,maxZoom:19,errorTileUrl:ERR,className:'tplan',attribution:'Fond : Esri · Données : '+CFG.org}).addTo(map);
 const BASE_SAT=L.tileLayer(ESRI+'World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxNativeZoom:18,maxZoom:19,errorTileUrl:ERR,attribution:'Imagerie : Esri · Données : '+CFG.org});
 let SAT=false;
 map.createPane('mask');map.getPane('mask').style.zIndex=340;map.getPane('mask').style.pointerEvents='none';
 map.createPane('roads');map.getPane('roads').style.zIndex=420;map.getPane('roads').style.pointerEvents='none';
 map.createPane('labels');map.getPane('labels').style.zIndex=450;map.getPane('labels').style.pointerEvents='none';
-L.tileLayer(CARTO+'dark_only_labels/{z}/{x}/{y}{r}.png',{pane:'labels',subdomains:'abcd',maxZoom:19,errorTileUrl:ERR,opacity:.9}).addTo(map);
+L.tileLayer(ESRI+'Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',{pane:'labels',maxNativeZoom:16,maxZoom:19,errorTileUrl:ERR,className:'tlab'}).addTo(map);
 const WORLD=[[70,-100],[70,-40],[35,-40],[35,-100]],MASK={};
 YKS.forEach(yk=>{if(DATA[yk].m&&DATA[yk].m.length)MASK[yk]=L.layerGroup([L.polygon([WORLD,...DATA[yk].m],{pane:'mask',interactive:false,stroke:false,fillColor:'#0b0d12',fillOpacity:.72}),L.polygon(DATA[yk].m,{pane:'roads',interactive:false,fill:false,color:'#ffffff',weight:2.2,opacity:.85})]);});
 function maskLayer(){YKS.forEach(yk=>{if(!MASK[yk])return;yk===YK?map.addLayer(MASK[yk]):map.removeLayer(MASK[yk]);});}
@@ -394,3 +394,6 @@ map.on('popupopen',()=>$('mapwrap').classList.add('pop'));map.on('popupclose',()
   d.querySelectorAll('a').forEach(x=>x.classList.toggle('on',x===a));st('aeq_sat',SAT?'1':'0');LAY[YK].setStyle(style);});
  return d;}});new C().addTo(map);
  if(gt('aeq_sat')==='1')setTimeout(()=>document.querySelector('.basesw a[data-b=sat]').click(),0);})();
+
+/* plus on zoome, plus les rues et leurs noms transparaissent sous les couleurs */
+let ZL=ZOP();map.on('zoomend',()=>{const z=ZOP();if(z!==ZL){ZL=z;LAY[YK].setStyle(style);}});

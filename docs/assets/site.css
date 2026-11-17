@@ -246,3 +246,5 @@ footer{border-top:1px solid var(--line)}
 .lnote{font-size:.76rem;color:var(--ink3);margin-top:4px;line-height:1.35}
 .numlabel{font:700 10px Inter;color:#fff;text-shadow:0 0 3px rgba(0,0,0,.9),0 0 2px rgba(0,0,0,.9)}
 .leaflet-container{background:#0b0d12}
+.tplan{filter:brightness(.62) contrast(1.15) saturate(0)}
+.tlab{filter:brightness(1.35) contrast(1.1)}
