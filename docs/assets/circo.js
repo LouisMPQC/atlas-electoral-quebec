@@ -397,3 +397,5 @@ map.on('popupopen',()=>$('mapwrap').classList.add('pop'));map.on('popupclose',()
 
 /* plus on zoome, plus les rues et leurs noms transparaissent sous les couleurs */
 let ZL=ZOP();map.on('zoomend',()=>{const z=ZOP();if(z!==ZL){ZL=z;LAY[YK].setStyle(style);}});
+/* après le code d'accès : la carte était cachée, on la recalcule */
+addEventListener('aeq-unlock',()=>{setTimeout(()=>{map.invalidateSize();const q=new URLSearchParams(location.search).get('s');if(q&&BYN[CUR]&&BYN[CUR][q])goto(q);else fit();},30);});
