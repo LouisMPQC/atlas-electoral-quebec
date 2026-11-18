@@ -270,7 +270,7 @@ $('msel').onchange=e=>go(e.target.value);
 $('q').oninput=list;
 $('tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{ORD=b.dataset.o;$('tabs').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));list();});
 addEventListener('hashchange',()=>{parseHash();render();});
-fetch('assets/regions.json?v=202611171607').then(r=>r.json()).then(d=>{N=d;
+fetch('assets/regions.json?v=202611172001').then(r=>r.json()).then(d=>{N=d;
  $('logop').setAttribute('d',N.sil.QC);
  $('parts').innerHTML=N.fed.circ.filter(x=>x.b26).map(x=>'<a href="federal/'+x.s+'/"><b>'+esc(x.n)+'</b>'+esc(x.b26)+' pour le Bloc</a>').join('');
  parseHash();render();
