@@ -17,10 +17,19 @@ jobs:
           D = json.load(open('donnees/lieux_partielles.json', encoding='utf-8'))
           adrs = sorted({x['adr'] for c in D.values() for t in ('bvo', 'bva') for x in c.get(t, [])})
           out = {}
+          UA = {'User-Agent': 'Mozilla/5.0 (atlas-electoral-quebec; geocodage des lieux de vote)', 'Accept': 'application/json', 'Referer': 'https://louismpqc.github.io/atlas-electoral-quebec/'}
+          def osm(a):
+              try:
+                  u = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ca&q=' + urllib.parse.quote(a + ', Québec')
+                  j = json.load(urllib.request.urlopen(urllib.request.Request(u, headers={'User-Agent': 'atlas-electoral-quebec/1.0 (github.com/LouisMPQC)'}), timeout=30))
+                  time.sleep(1.1)
+                  return {'lng': float(j[0]['lon']), 'lat': float(j[0]['lat']), 'trouve': 'OSM: ' + j[0]['display_name'][:80]} if j else None
+              except Exception as e:
+                  print('osm', a, e); return None
           for a in adrs:
               u = 'https://geoegl.msp.gouv.qc.ca/apis/icherche/geocode?type=adresses&limit=1&geometry=true&q=' + urllib.parse.quote(a)
               try:
-                  j = json.load(urllib.request.urlopen(u, timeout=30))
+                  j = json.load(urllib.request.urlopen(urllib.request.Request(u, headers=UA), timeout=30))
                   f = (j.get('features') or [None])[0]
                   if f:
                       g = f['geometry']; c = g['coordinates']
@@ -32,6 +41,7 @@ jobs:
                   else: out[a] = None
               except Exception as e:
                   out[a] = None; print('erreur', a, e)
+              if not out[a]: out[a] = osm(a)
               time.sleep(0.3)
           json.dump(out, open('geocodage.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
           print(sum(1 for v in out.values() if v), 'sur', len(out))
