@@ -258,3 +258,6 @@ footer{border-top:1px solid var(--line)}
 .lvbox textarea{width:100%;min-height:180px;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px;color:var(--ink);font:500 .85rem/1.5 Inter;padding:10px 12px;resize:vertical}
 .lvst{font-size:.84rem;color:var(--ink2);min-height:1.3em;margin:10px 0}
 .lvact{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}.lvact .pr{background:var(--ink);color:#111}
+.lvpin.bva{background:#b9a6f6}.lvpin b{font:800 11px Inter;color:#16181d}
+.lvsec{margin-top:8px;padding:8px 10px;border-radius:10px;background:rgba(246,216,115,.08);border:1px solid rgba(246,216,115,.25);font-size:.78rem;line-height:1.45;display:grid;gap:4px}
+.lvsec a{color:var(--yel)}

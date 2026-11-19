@@ -150,6 +150,8 @@ function popup(p){const k=p.k,d=R()[k];
   h+='<div class="pb'+(x===ME?' me':'')+'"><span class="nm">'+PL[x]+'</span><span class="tr"><i style="width:'+Math.min(100,v/70*100)+'%;background:'+PC[x]+'"></i></span><span class="pc">'+f1(v)+' %</span></div>';});
   const e=E(k);let ev='';if(YK===CUR&&e&&!A){EVS.forEach(([y,yl])=>{if(e[y]){const v=pct(d,ME)-e[y][ME];ev+=' Depuis '+yl+' : <b>'+(v>=0?'+':'')+f1(v)+' pts</b>.';}});if(ev)ev=' '+NM+' (estimation sur cette section) :'+ev;}
   const pq=!A&&YK===CUR?pqK(k):null;
+  if(DATA.lieux&&YK===CUR&&window.lieuxDe){const lv=lieuxDe(k),it=l=>' <a href="https://www.google.com/maps/dir/?api=1&destination='+l.lat.toFixed(5)+','+l.lng.toFixed(5)+'" target="_blank" rel="noopener">itinéraire</a>';
+   if(lv.bvo||lv.bva)h+='<div class="lvsec">'+(lv.bvo?'<div><b>Vote le 7 décembre</b> : '+lv.bvo.nom+', '+lv.bvo.adr+(lv.bvo.lat!=null?' ·'+it(lv.bvo):'')+'</div>':'')+(lv.bva?'<div><b>Par anticipation (27 au 30 nov.)</b> : BVA '+lv.bva.no+', '+lv.bva.nom+(lv.bva.lat!=null?' ·'+it(lv.bva):'')+'</div>':'')+'</div>';}
   h+='<div class="ft">'+n0(tot(d))+(A?' votes par anticipation dans ce bureau':' votes le jour du scrutin')+(DATA.bq26&&!A?', dont <b>'+n0(d[ME]||0)+' '+NM+'</b>':'')+'.'+ev+(pq!=null?' PQ le 5 octobre 2026 (estimation) : <b>'+f1(pq)+' %</b>.':'')+'</div>';}
  const cc=BYN[YK]&&BYN[YK][k]?BYN[YK][k].getBounds().getCenter():null;
  if(cc)h+='<div class="pact"><a href="https://www.google.com/maps/dir/?api=1&destination='+cc.lat.toFixed(5)+','+cc.lng.toFixed(5)+'" target="_blank" rel="noopener">Itinéraire</a><button onclick="shareSec(\''+k+'\')">Copier le lien</button></div>';
@@ -422,7 +424,7 @@ map.on('popupopen',()=>$('mapwrap').classList.add('pop'));map.on('popupclose',()
  if(gt('aeq_sat')==='1')setTimeout(()=>document.querySelector('.basesw a[data-b=sat]').click(),0);})();
 
 /* plus on zoome, plus les rues et leurs noms transparaissent sous les couleurs */
-let ZL=ZOP();map.on('zoomend',()=>{const z=ZOP();if(z!==ZL){ZL=z;LAY[YK].setStyle(style);}});
+let ZL=ZOP();map.on('zoomend',()=>{const z=ZOP();if(z!==ZL){ZL=z;LAY[YK].setStyle(style);if(window.lvReHL)lvReHL();}});
 /* après le code d'accès : la carte était cachée, on la recalcule */
 addEventListener('aeq-unlock',()=>{setTimeout(()=>{map.invalidateSize();const q=new URLSearchParams(location.search).get('s');if(q&&BYN[CUR]&&BYN[CUR][q])goto(q);else fit();},30);});
 
@@ -453,7 +455,32 @@ if(DATA.bq26){
    LIEUX=out;try{localStorage.setItem(LK,JSON.stringify(LIEUX));}catch(x){}drawL();e.target.disabled=false;
    const ok=out.filter(l=>l.lat!=null);if(ok.length)map.fitBounds(L.latLngBounds(ok.map(l=>[l.lat,l.lng])).pad(.2));
    st.innerHTML='<b>'+ok.length+' lieu'+(ok.length>1?'x':'')+'</b> placé'+(ok.length>1?'s':'')+' sur la carte.'+(bad.length?' Adresse introuvable : '+bad.map(esc).join(', ')+'. Vérifiez l’orthographe ou ajoutez la ville.':'');};}
- const C2=L.Control.extend({options:{position:'topright'},onAdd(){const d=L.DomUtil.create('div','leaflet-bar lvb');d.innerHTML='<a href="#" role="button" title="Ajouter les lieux de vote" aria-label="Lieux de vote"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9l8-5 8 5v12"/><path d="M9 21v-6h6v6"/></svg></a>';
+ if(!DATA.lieux){const C2=L.Control.extend({options:{position:'topright'},onAdd(){const d=L.DomUtil.create('div','leaflet-bar lvb');d.innerHTML='<a href="#" role="button" title="Ajouter les lieux de vote" aria-label="Lieux de vote"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9l8-5 8 5v12"/><path d="M9 21v-6h6v6"/></svg></a>';
   L.DomEvent.disableClickPropagation(d);d.firstChild.onclick=e=>{e.preventDefault();dlg();};return d;}});new C2().addTo(map);
- drawL();
+ drawL();}
+}
+
+/* ---------- lieux de vote officiels (liste du directeur du scrutin) ---------- */
+if(DATA.lieux){
+ const LV=DATA.lieux,G=L.layerGroup(),SEC_BVO={},SEC_BVA={},secK=n=>DATA.code+'_'+n;
+ LV.bvo.forEach(l=>l.sec.forEach(n=>SEC_BVO[secK(n)]=l));LV.bva.forEach(l=>l.sec.forEach(n=>SEC_BVA[secK(n)]=l));
+ const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+ const ico=(cls,txt)=>L.divIcon({className:'',html:'<div class="lvpin '+cls+'">'+(cls==='bva'?'<b>A</b>':'<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#16181d" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9l8-5 8 5v12"/><path d="M9 21v-6h6v6"/></svg>')+(txt?'<span>'+txt+'</span>':'')+'</div>',iconSize:[28,24],iconAnchor:[14,12]});
+ const itin=l=>'https://www.google.com/maps/dir/?api=1&destination='+l.lat.toFixed(5)+','+l.lng.toFixed(5);
+ let HL=[];window.lvReHL=()=>HL.forEach(k=>{BYN[YK][k].setStyle({color:'#f6d873',weight:3,opacity:1});BYN[YK][k].bringToFront();});function hlSecs(ns){HL.forEach(k=>BYN[YK][k]&&LAY[YK].resetStyle(BYN[YK][k]));HL=ns.map(secK).filter(k=>BYN[YK]&&BYN[YK][k]);HL.forEach(k=>{BYN[YK][k].setStyle({color:'#f6d873',weight:3,opacity:1});BYN[YK][k].bringToFront();});}
+ window.lvHL=i=>{const [t,j]=i.split(':'),l=LV[t][+j];hlSecs(l.sec);const b=L.latLngBounds(HL.map(k=>BYN[YK][k].getBounds()));b.extend([l.lat,l.lng]);map.flyToBounds(b,{padding:[50,50],maxZoom:16});};
+ function pop(l,t,j){const quand=t==='bva'?'Vote par anticipation · du vendredi 27 au lundi 30 novembre 2026, de 9 h à 21 h':'Jour du scrutin · lundi 7 décembre 2026';
+  return '<div class="pp"><h3>'+esc(l.nom)+'</h3><div class="m">'+(t==='bva'?'Bureau par anticipation '+l.no+' · ':'')+esc(l.adr)+'</div><div class="st">'+quand+'</div>'+
+   '<div class="ft">Sections desservies ('+l.sec.length+') : '+l.sec.join(', ')+'</div><div class="pact"><a href="'+itin(l)+'" target="_blank" rel="noopener">Itinéraire</a><button onclick="lvHL(\''+t+':'+j+'\')">Voir les sections</button></div></div>';}
+ const vus={};
+ LV.bvo.forEach((l,j)=>{if(l.lat==null)return;L.marker([l.lat,l.lng],{icon:ico('bvo'),zIndexOffset:800,title:l.nom}).bindPopup(()=>pop(l,'bvo',j),{maxWidth:320}).addTo(G);});
+ LV.bva.forEach((l,j)=>{if(l.lat==null)return;const key=l.lat.toFixed(5)+l.lng.toFixed(5),off=(vus[key]=(vus[key]||0)+1)-1;
+  L.marker([l.lat,l.lng],{icon:ico('bva',l.no),zIndexOffset:850,title:'BVA '+l.no,riseOnHover:true}).setLatLng([l.lat+off*0.00018,l.lng+0.00025]).bindPopup(()=>pop(l,'bva',j),{maxWidth:320}).addTo(G);});
+ map.on('popupclose',()=>{if(HL.length){hlSecs([]);}});
+ const tg=document.querySelector('.mtools .tog');
+ if(tg){const lb=document.createElement('label');lb.innerHTML='<input type="checkbox" id="lvon" checked> Lieux de vote';tg.appendChild(lb);
+  const cb=lb.querySelector('input');let on=true;try{on=localStorage.getItem('aeq_lv')!=='0';}catch(e){}cb.checked=on;if(on)G.addTo(map);
+  cb.onchange=()=>{if(cb.checked)G.addTo(map);else map.removeLayer(G);try{localStorage.setItem('aeq_lv',cb.checked?'1':'0');}catch(e){}};}
+ else G.addTo(map);
+ window.lieuxDe=k=>({bvo:SEC_BVO[k],bva:SEC_BVA[k]});
 }
