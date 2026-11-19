@@ -125,14 +125,57 @@ function renderRes(){const c=C(),r=c.res,y=YR[YK];
 const map=L.map('map',{zoomControl:false,minZoom:5,maxZoom:17,attributionControl:true}).setView([46.8,-71.2],11);
 L.control.zoom({position:'topright'}).addTo(map);
 const ERR='data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
-const ESRI='https://server.arcgisonline.com/ArcGIS/rest/services/';
-const BASE_PLAN=L.tileLayer(ESRI+'Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{maxNativeZoom:16,maxZoom:19,errorTileUrl:ERR,className:'tplan',attribution:'Fond : Esri · Données : '+CFG.org}).addTo(map);
-const BASE_SAT=L.tileLayer(ESRI+'World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxNativeZoom:18,maxZoom:19,errorTileUrl:ERR,attribution:'Imagerie : Esri · Données : '+CFG.org});
-let SAT=false;
 map.createPane('mask');map.getPane('mask').style.zIndex=340;map.getPane('mask').style.pointerEvents='none';
 map.createPane('roads');map.getPane('roads').style.zIndex=420;map.getPane('roads').style.pointerEvents='none';
 map.createPane('labels');map.getPane('labels').style.zIndex=450;map.getPane('labels').style.pointerEvents='none';
-L.tileLayer(ESRI+'Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',{pane:'labels',maxNativeZoom:16,maxZoom:19,errorTileUrl:ERR,className:'tlab'}).addTo(map);
+/* ---------- fonds de carte : Google (Map Tiles API) si la clé répond, sinon Esri ----------
+   La clé est publique par nature (site statique) : elle est restreinte au domaine louismpqc.github.io
+   et à la seule Map Tiles API dans la console Google Cloud. */
+const ESRI='https://server.arcgisonline.com/ArcGIS/rest/services/';
+const E_PLAN=L.tileLayer(ESRI+'Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{maxNativeZoom:16,maxZoom:19,errorTileUrl:ERR,className:'tplan',attribution:'Fond : Esri · Données : '+CFG.org});
+const E_SAT=L.tileLayer(ESRI+'World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxNativeZoom:18,maxZoom:19,errorTileUrl:ERR,attribution:'Imagerie : Esri · Données : '+CFG.org});
+const E_LAB=L.tileLayer(ESRI+'Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',{pane:'labels',maxNativeZoom:16,maxZoom:19,errorTileUrl:ERR,className:'tlab'});
+let BASE_PLAN=E_PLAN,BASE_SAT=E_SAT,LABELS=E_LAB,SAT=false,BASE_ON=false;
+function setBase(){[E_PLAN,E_SAT,E_LAB,window.G_PLAN,window.G_SAT,window.G_LAB].forEach(l=>{if(l&&map.hasLayer(l))map.removeLayer(l);});
+ if(BASE_ON){(SAT?BASE_SAT:BASE_PLAN).addTo(map);LABELS.addTo(map);}}
+(function(){
+ const GKEY='AIzaSyBGGT1T-i1iHU3-1s_evLWXe_r6DbhBnio',HD=(window.devicePixelRatio||1)>1.2;
+ const V=[{visibility:'off'}];
+ const STY_PLAN=[{elementType:'labels',stylers:V},{featureType:'poi',stylers:V},{featureType:'transit',stylers:V},
+  {featureType:'administrative',elementType:'geometry',stylers:V},
+  {elementType:'geometry',stylers:[{color:'#1b1e24'}]},
+  {featureType:'landscape.man_made',elementType:'geometry',stylers:[{color:'#20242b'}]},
+  {featureType:'landscape.natural',elementType:'geometry',stylers:[{color:'#1a1d22'}]},
+  {featureType:'water',elementType:'geometry',stylers:[{color:'#0d1015'}]},
+  {featureType:'road',elementType:'geometry.fill',stylers:[{color:'#2d323b'}]},
+  {featureType:'road',elementType:'geometry.stroke',stylers:V},
+  {featureType:'road.arterial',elementType:'geometry.fill',stylers:[{color:'#363c46'}]},
+  {featureType:'road.highway',elementType:'geometry.fill',stylers:[{color:'#424956'}]}];
+ const STY_LAB=[{elementType:'geometry',stylers:V},{featureType:'poi',stylers:V},{featureType:'transit',stylers:V},
+  {elementType:'labels.icon',stylers:V},
+  {elementType:'labels.text.fill',stylers:[{color:'#e4e7ec'}]},
+  {elementType:'labels.text.stroke',stylers:[{color:'#0b0d12'},{weight:3}]},
+  {featureType:'road',elementType:'labels.text.fill',stylers:[{color:'#b9bfc9'}]},
+  {featureType:'administrative.locality',elementType:'labels.text.fill',stylers:[{color:'#ffffff'}]}];
+ const sess=(nom,corps)=>{const ck='aeq_g1_'+nom+(HD?'_hd':'');
+  try{const c=JSON.parse(localStorage.getItem(ck)||'null');if(c&&c.exp*1000>Date.now()+864e5)return Promise.resolve(c.s);}catch(e){}
+  return fetch('https://tile.googleapis.com/v1/createSession?key='+GKEY,{method:'POST',headers:{'Content-Type':'application/json'},
+   body:JSON.stringify(Object.assign({language:'fr-CA',region:'CA'},HD&&nom!=='sat'?{scale:'scaleFactor2x',highDpi:true}:{},corps))})
+   .then(r=>r.ok?r.json():Promise.reject(r.status)).then(j=>{if(!j.session)throw 0;try{localStorage.setItem(ck,JSON.stringify({s:j.session,exp:+j.expiry}));}catch(e){}return j.session;});};
+ const oubli=()=>{try{Object.keys(localStorage).filter(k=>k.indexOf('aeq_g1_')===0).forEach(k=>localStorage.removeItem(k));}catch(e){}};
+ const logo='<img src="https://maps.gstatic.com/mapfiles/api-3/images/google_white5.png" alt="Google" style="height:11px;vertical-align:-1px">';
+ let err=0;const repli=()=>{if(BASE_PLAN===E_PLAN)return;oubli();BASE_PLAN=E_PLAN;BASE_SAT=E_SAT;LABELS=E_LAB;setBase();};
+ const tuile=(s,o)=>L.tileLayer('https://tile.googleapis.com/v1/2dtiles/{z}/{x}/{y}?session='+s+'&key='+GKEY,Object.assign({maxZoom:19,errorTileUrl:ERR},o))
+  .on('tileerror',()=>{if(++err>12)repli();});
+ const pret=Promise.all([sess('plan',{mapType:'roadmap',styles:STY_PLAN}),sess('lab',{mapType:'roadmap',overlay:true,styles:STY_LAB}),sess('sat',{mapType:'satellite'})])
+  .then(([p,l,s])=>{
+   window.G_PLAN=BASE_PLAN=tuile(p,{className:'gplan',attribution:logo+' Fond : © Google · Données : '+CFG.org});
+   window.G_SAT=BASE_SAT=tuile(s,{attribution:logo+' Imagerie : © Google · Données : '+CFG.org});
+   window.G_LAB=LABELS=tuile(l,{pane:'labels',className:'glab'});
+   setBase();}).catch(()=>{});
+ /* on attend Google au plus 2,5 s, puis on affiche ce qu'on a */
+ Promise.race([pret,new Promise(r=>setTimeout(r,2500))]).then(()=>{BASE_ON=true;setBase();});
+})();
 const WORLD=[[70,-100],[70,-40],[35,-40],[35,-100]],MASK={};
 YKS.forEach(yk=>{if(DATA[yk].m&&DATA[yk].m.length)MASK[yk]=L.layerGroup([L.polygon([WORLD,...DATA[yk].m],{pane:'mask',interactive:false,stroke:false,fillColor:'#0b0d12',fillOpacity:.72}),L.polygon(DATA[yk].m,{pane:'roads',interactive:false,fill:false,color:'#ffffff',weight:2.2,opacity:.85})]);});
 function maskLayer(){YKS.forEach(yk=>{if(!MASK[yk])return;yk===YK?map.addLayer(MASK[yk]):map.removeLayer(MASK[yk]);});}
@@ -418,7 +461,7 @@ map.on('popupopen',()=>$('mapwrap').classList.add('pop'));map.on('popupclose',()
 (function(){const C=L.Control.extend({options:{position:'topright'},onAdd(){const d=L.DomUtil.create('div','leaflet-bar basesw');
  d.innerHTML='<a href="#" data-b="plan" class="on" title="Plan">Plan</a><a href="#" data-b="sat" title="Photo aérienne">Satellite</a>';
  L.DomEvent.disableClickPropagation(d);d.querySelectorAll('a').forEach(a=>a.onclick=e=>{e.preventDefault();const sat=a.dataset.b==='sat';if(sat===SAT)return;SAT=sat;
-  if(SAT){map.removeLayer(BASE_PLAN);BASE_SAT.addTo(map);}else{map.removeLayer(BASE_SAT);BASE_PLAN.addTo(map);}
+  setBase();
   d.querySelectorAll('a').forEach(x=>x.classList.toggle('on',x===a));st('aeq_sat',SAT?'1':'0');LAY[YK].setStyle(style);});
  return d;}});new C().addTo(map);
  if(gt('aeq_sat')==='1')setTimeout(()=>document.querySelector('.basesw a[data-b=sat]').click(),0);})();
