@@ -80,3 +80,10 @@ Tests faits avec Playwright (Chromium préinstallé) sur un serveur local (`pyth
 
 - Lieux de vote officiels de Rosemont et de Saint-Hyacinthe (dès réception).
 - Profils de recensement par section (Statistique Canada) : faisable mais lourd.
+
+## Codes personnels et journal des accès (19 novembre 2026)
+
+- En plus du code de chaque circonscription et du code universel, chaque personne peut avoir son propre code à 6 chiffres, avec une liste d'accès : `*` (tout), `circonscription/*`, `federal/*` ou des pages précises (`circonscription/levis`).
+- Les personnes, leurs codes et leurs accès vivent hors du dépôt (document « atlas-codes-personnels » du projet claude.ai). `python3 scripts/personnes.py personnes.json docs [URL_DU_JOURNAL]` écrit dans `gate.js` seulement l'identifiant, le sel, l'empreinte et les accès (ni nom ni code). `gate.js` n'est pas régénéré par la reconstruction : ces réglages y restent.
+- Journal : chaque tentative (page, résultat ok / refus / hors accès, identifiant, type d'appareil, taille d'écran ; jamais le code tapé ni l'adresse IP) est envoyée au script Apps Script `scripts/journal_apps_script.gs`, lié au Google Sheet « Atlas électoral : administration des accès » (onglets Journal et Personnes). Tant que l'URL du journal est vide, rien n'est envoyé.
+- Le journal reflète l'usage normal ; une personne avertie peut contourner la barrière JavaScript sans laisser de trace.
