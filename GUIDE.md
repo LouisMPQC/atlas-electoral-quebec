@@ -26,7 +26,8 @@ Liens directs utiles : `/#prov/12` (une région au provincial), `/#fed/16` (au f
 - Questions : où le parti est fort, face à un autre parti, score de chaque parti, gagnant (intensité selon l'avance), participation, progression depuis l'élection précédente.
 - Filtres, secteurs (municipalités, quartiers de Montréal ou secteurs de BVA), onglets Bureaux / Secteurs / À cibler / Évolution, export CSV, impression propre des listes.
 - Terrain : bouton « Me localiser » (suivi GPS continu et section courante), Itinéraire Google Maps et lien direct dans chaque fiche de section, bouton Plan / Satellite, mode terrain, carte en premier sur téléphone.
-- Fond de carte : Esri Dark Gray assombri (Carto exige maintenant une clé payante). Les rues et leurs noms transparaissent en zoomant.
+- Fond de carte : Google (Map Tiles API) depuis le 19 novembre 2026 : plan sombre sur mesure sans étiquettes, couche d'étiquettes transparente au-dessus des couleurs, satellite Google. Repli automatique sur Esri Dark Gray si Google ne répond pas en 2,5 s ou si les tuiles échouent. Les rues et leurs noms transparaissent en zoomant.
+- Clé Google : projet Google Cloud « API KEY -LMP », clé « Atlas électoral - fonds de carte », écrite dans `docs/assets/circo.js` (publique par nature). Restreinte au référent `https://louismpqc.github.io/*` et à la seule Map Tiles API : elle ne fonctionne pas depuis `localhost` (les tests locaux montrent le repli Esri, c'est normal). Les jetons de session sont gardés dans le navigateur (`aeq_g1_*`) jusqu'à leur expiration pour profiter du cache. Alerte de budget « Alerte Atlas » à 10 $ par mois (courriels à 50, 90 et 100 %). Gratuit jusqu'à 100 000 tuiles 2D par mois.
 
 ### Partielles fédérales du 7 décembre 2026 (seulement sur ces 3 pages)
 
@@ -74,10 +75,8 @@ Tests faits avec Playwright (Chromium préinstallé) sur un serveur local (`pyth
 - Style visuel : verre dépoli sombre, tuiles pastel, police Inter (inspiré d'une maquette fournie par Louis). Route 127 sert de référence pour la netteté des cartes.
 - Le nom de Louis figure sur le site (en-tête et pied de page).
 - Accès : barrière JavaScript assumée (simple, pas un coffre-fort). Codes à 3 chiffres redemandés à chaque visite, code universel pour Louis, partielles libres. Vraie protection possible plus tard : Cloudflare Pages + Access (dépôt privé, nom de domaine).
-- Clé Google Maps (Map Tiles API, fond sombre sur mesure et satellite) : envisagée, pas encore faite.
 
 ## Idées en attente
 
 - Lieux de vote officiels de Rosemont et de Saint-Hyacinthe (dès réception).
-- Fond Google Maps si une clé est fournie.
 - Profils de recensement par section (Statistique Canada) : faisable mais lourd.
