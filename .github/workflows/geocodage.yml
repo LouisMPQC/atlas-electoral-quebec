@@ -1,0 +1,44 @@
+name: Géocodage des lieux de vote
+on:
+  workflow_dispatch:
+  push:
+    paths: ['donnees/lieux_partielles.json']
+permissions:
+  contents: write
+jobs:
+  geo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Géocoder avec Adresses Québec (iCherche)
+        run: |
+          python3 - <<'PY'
+          import json, urllib.request, urllib.parse, time
+          D = json.load(open('donnees/lieux_partielles.json', encoding='utf-8'))
+          adrs = sorted({x['adr'] for c in D.values() for t in ('bvo', 'bva') for x in c.get(t, [])})
+          out = {}
+          for a in adrs:
+              u = 'https://geoegl.msp.gouv.qc.ca/apis/icherche/geocode?type=adresses&limit=1&geometry=true&q=' + urllib.parse.quote(a)
+              try:
+                  j = json.load(urllib.request.urlopen(u, timeout=30))
+                  f = (j.get('features') or [None])[0]
+                  if f:
+                      g = f['geometry']; c = g['coordinates']
+                      if g['type'] != 'Point':
+                          pts = c[0] if g['type'] == 'Polygon' else c
+                          while isinstance(pts[0][0], list): pts = pts[0]
+                          c = [sum(p[0] for p in pts) / len(pts), sum(p[1] for p in pts) / len(pts)]
+                      out[a] = {'lng': c[0], 'lat': c[1], 'trouve': f['properties'].get('nom') or f['properties'].get('recherche')}
+                  else: out[a] = None
+              except Exception as e:
+                  out[a] = None; print('erreur', a, e)
+              time.sleep(0.3)
+          json.dump(out, open('geocodage.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+          print(sum(1 for v in out.values() if v), 'sur', len(out))
+          PY
+      - name: Publier
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete geocodage -y --cleanup-tag || true
+          gh release create geocodage geocodage.json -t "Géocodage des lieux de vote" -n "Généré automatiquement"
