@@ -1,0 +1,60 @@
+{
+ "circonscription/beauce-sud": [
+  "05"
+ ],
+ "circonscription/bertrand": [
+  "14"
+ ],
+ "circonscription/cote-du-sud": [
+  "01"
+ ],
+ "circonscription/daniel-johnson": [
+  "05"
+ ],
+ "circonscription/les-plaines": [
+  "15"
+ ],
+ "circonscription/megantic": [
+  "12"
+ ],
+ "federal/abitibi-baie-james-nunavik-eeyou": [
+  "10"
+ ],
+ "federal/argenteuil-la-petite-nation": [
+  "15"
+ ],
+ "federal/becancour-nicolet-saurel-alnobak": [
+  "17"
+ ],
+ "federal/berthier-maskinonge": [
+  "04"
+ ],
+ "federal/brome-missisquoi": [
+  "05"
+ ],
+ "federal/cote-du-sud-riviere-du-loup-kataskomiq-temiscouata": [
+  "12"
+ ],
+ "federal/gaspesie-les-iles-de-la-madeleine-listuguj": [
+  "01"
+ ],
+ "federal/laurentides-labelle": [
+  "14"
+ ],
+ "federal/les-pays-d-en-haut": [
+  "14"
+ ],
+ "federal/megantic-l-erable-lotbiniere": [
+  "17",
+  "05"
+ ],
+ "federal/richmond-arthabaska": [
+  "05"
+ ],
+ "federal/shefford": [
+  "05"
+ ],
+ "federal/therese-de-blainville": [
+  "14"
+ ]
+}

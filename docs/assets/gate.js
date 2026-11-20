@@ -15,6 +15,7 @@
   m.textContent='Les consultations de cette carte sont comptées de façon anonyme pour améliorer l’outil (circonscription, date, type d’appareil). Aucun renseignement personnel n’est recueilli.';f.appendChild(m);}
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mention);else mention();
  var G=window.AEQ_G,M={s:"541b0a8d451bfb9a",h:"488e0c6e53722074ff1008bee7060d47854951c1b66d2d34d7ca7bbf9044db3e"};if(!ACTIF||!G)return;
+ var GL=Array.isArray(G)?G:[G];
  document.documentElement.classList.add('gated');
  var css=document.createElement('style');
  css.textContent='html.gated body>*:not(#gate){display:none!important}html.gated body{overflow:hidden}'+
@@ -44,10 +45,12 @@
   document.body.appendChild(g);var f=g.querySelector('form'),i=g.querySelector('input'),er=g.querySelector('.er'),b=g.querySelector('button');i.focus();
   f.onsubmit=function(e){e.preventDefault();if(b.disabled)return;
    var v=i.value.replace(/\D/g,'');
-   Promise.all([sha(G.s+':'+v),sha(M.s+':'+v)].concat(P.map(function(x){return sha(x.s+':'+v);}))).then(function(r){
+   Promise.all([sha(M.s+':'+v)].concat(GL.map(function(x){return sha(x.s+':'+v);}),P.map(function(x){return sha(x.s+':'+v);}))).then(function(r){
+    var nG=GL.length;
     var qui='',res='refus';
-    if(r[0]===G.h){qui=G.r?'reg'+G.r:'equipe';res='ok';}else if(r[1]===M.h){qui='universel';res='ok';}
-    else for(var n=0;n<P.length;n++)if(r[n+2]===P[n].h){qui=P[n].i;res=permis(P[n].a)?'ok':'hors';break;}
+    if(r[0]===M.h){qui='universel';res='ok';}
+    for(var q=0;q<nG&&res!=='ok';q++)if(r[q+1]===GL[q].h){qui=GL[q].r?'reg'+GL[q].r:'equipe';res='ok';}
+    if(res!=='ok')for(var n=0;n<P.length;n++)if(r[n+1+nG]===P[n].h){qui=P[n].i;res=permis(P[n].a)?'ok':'hors';break;}
     journal(res,qui);
     if(res==='ok'){document.documentElement.classList.remove('gated');g.remove();window.dispatchEvent(new Event('aeq-unlock'));}
     else{essais++;er.textContent=res==='hors'?'Ce code ne donne pas accès à cette circonscription.':'Code incorrect.';i.select();

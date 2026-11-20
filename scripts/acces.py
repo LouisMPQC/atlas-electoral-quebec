@@ -38,9 +38,12 @@ for p in pages:
     if key not in codes:
         codes[key] = {'code': nouveau(), 'sel': secrets.token_hex(8)}; n_new += 1
     e = codes[key]
-    h = hashlib.sha256((e['sel'] + ':' + e['code']).encode()).hexdigest()
-    r = f',r:"{e["r"]}"' if e.get('r') else ''  # code par région : la région est notée au journal
-    html = html[:i] + f'<script>window.AEQ_G={{s:"{e["sel"]}",h:"{h}"{r}}}</script>' + html[i:]
+    def obj(x):  # sel, empreinte et, pour un code de région, la région (notée au journal)
+        h = hashlib.sha256((x['sel'] + ':' + x['code']).encode()).hexdigest()
+        r = f',r:"{x["r"]}"' if x.get('r') else ''
+        return f'{{s:"{x["sel"]}",h:"{h}"{r}}}'
+    g = obj(e) if not e.get('autres') else '[' + ','.join(obj(x) for x in [e] + e['autres']) + ']'
+    html = html[:i] + f'<script>window.AEQ_G={g}</script>' + html[i:]
     open(p, 'w', encoding='utf-8').write(html)
 json.dump(codes, open(CODES, 'w'), indent=1, ensure_ascii=False)
 print('pages', len(pages), 'nouveaux codes', n_new)
