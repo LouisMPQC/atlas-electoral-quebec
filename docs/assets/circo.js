@@ -28,7 +28,18 @@ let YK=YKS.includes(gt('aeq_y'))?gt('aeq_y'):CUR,Q='me',TAB='tab',SEE=gt('aeq_se
 let FILT={ty:'all',sec:'',lead:'',tp:ME,top:'ge',tv:'',q:'',tg:''},TG={k:'close',n:10},TSORT={k:'ins',d:-1},SSORT={k:'bt',d:-1};
 const RA={};
 function synthA(yk){const c=DATA[yk],o={};for(const k in c.bva){const a=c.A[c.bva[k]];if(!a)continue;o[k]=Object.assign({ins:(c.R[k]&&c.R[k].ins)||0},a.v);}return o;}
-const C=()=>DATA[YK],DAY=()=>C().R,R=()=>FILT.ty==='anti'?(RA[YK]||(RA[YK]=synthA(YK))):C().R;
+/* Votes complets par section : jour du scrutin + vote par anticipation de chaque BVA réparti entre ses sections
+   au prorata des votes du jour + votes spéciaux répartis de même sur toute la circonscription (même méthode que la
+   reconstruction des élections précédentes). La somme redonne le résultat officiel. */
+const FULL={};
+function full(yk){if(FULL[yk])return FULL[yk];const c=DATA[yk],D=c.R,o={};for(const k in D)o[k]=Object.assign({},D[k]);
+ const ok=s=>o[s]&&!isReg(D[s]),tous=Object.keys(o).filter(ok);
+ const add=(v,rej,mem)=>{mem=(mem||[]).filter(ok);if(!mem.length)mem=tous;const w=mem.map(s=>tot(D[s])),t=w.reduce((a,b)=>a+b,0);
+  mem.forEach((s,i)=>{const f=t?w[i]/t:1/mem.length;for(const p in v)o[s][p]=(o[s][p]||0)+v[p]*f;o[s].rej=(o[s].rej||0)+(rej||0)*f;});};
+ for(const a in (c.A||{}))add(c.A[a].v,c.A[a].rej,c.A[a].s);
+ for(const x in (c.SP||{}))add(c.SP[x],(c.SPr||{})[x],null);
+ return FULL[yk]=o;}
+const C=()=>DATA[YK],DAY=()=>C().R,SEC=()=>FILT.ty==='jour'?C().R:full(YK),R=()=>FILT.ty==='anti'?(RA[YK]||(RA[YK]=synthA(YK))):SEC();
 const secOf=k=>C().sec[k]||'',bvaOf=k=>C().bva[k];
 const LBL={};YKS.forEach(y=>{LBL[y]={};DATA[y].fc.features.forEach(f=>LBL[y][f.properties.k]=f.properties.n);for(const k in DATA[y].R)if(!LBL[y][k])LBL[y][k]=k.split('_')[1];});
 const lab=k=>LBL[YK][k]||k,secLab=()=>C().sectyp||'Secteur';
@@ -37,7 +48,7 @@ const tvNum=()=>{const t=parseFloat(String(FILT.tv).replace(',','.'));return isN
 const cmpT=v=>{const t=tvNum();return t==null||(FILT.top==='ge'?v>=t:v<=t);};
 const vsP=d=>pct(d,ME)-pct(d,VP);
 const INSX={};function insX(k){if(!INSX[YK]){const D=C().R,o={};for(const j in D){o[j]=(o[j]||0)+(D[j].ins||0);if(D[j].regr)o[D[j].regr]=(o[D[j].regr]||0)+(D[j].ins||0);}INSX[YK]=o;}return INSX[YK][k];}
-const partK=k=>{const d=DAY()[k],i=insX(k);return d&&i&&!isReg(d)?100*(tot(d)+(d.rej||0))/i:null;};
+const partK=k=>{const d=SEC()[k],i=insX(k);return d&&i&&!isReg(d)?100*(tot(d)+(d.rej||0))/i:null;};
 function mix(a,b,t){const h=x=>[1,3,5].map(i=>parseInt(x.slice(i,i+2),16)),A=h(a),B=h(b);return '#'+A.map((v,i)=>Math.round(v*(1-t)+B[i]*t).toString(16).padStart(2,'0')).join('');}
 function quint(vals,cols,fmt){const v=vals.filter(x=>x!=null&&isFinite(x)).sort((a,b)=>a-b);if(!v.length)return [[-1e9,cols[0],'—','']];
  const q=p=>v[Math.min(v.length-1,Math.floor(p*v.length))],c=[q(.8),q(.6),q(.4),q(.2)].map(x=>Math.round(x));
@@ -50,11 +61,11 @@ const prog=(d,k)=>{const e=E(k);return YK===CUR&&FILT.ty!=='anti'&&e&&e[EV]&&!is
 const gap1=d=>pct(d,win(d))-pct(d,ME);
 const second=d=>PO.filter(p=>p!=='AUT').sort((a,b)=>(d[b]||0)-(d[a]||0))[1];
 const TGT={
- close:{t:LEM+' à moins de N points du premier',f:k=>{const d=DAY()[k];return !isReg(d)&&win(d)!==ME&&gap1(d)<TG.n;}},
- lead:{t:LEM+' arrive premier',f:k=>{const d=DAY()[k];return !isReg(d)&&win(d)===ME;}},
- fragile:{t:LEM+' premier, mais avec moins de 5 points d’avance',f:k=>{const d=DAY()[k];return !isReg(d)&&win(d)===ME&&pct(d,ME)-pct(d,second(d))<5;}},
- strong:{t:LEM+' à '+CFG.strong+' % ou plus : faire sortir le vote',f:k=>{const d=DAY()[k];return !isReg(d)&&pct(d,ME)>=CFG.strong;}},
- up:{t:LEM+' en hausse depuis '+(EVS.length?EVS[0][1]:'')+' (estimation)',only:CUR,f:k=>{const d=DAY()[k],e=E(k);return !isReg(d)&&!!e&&!!e[EV0]&&pct(d,ME)-e[EV0][ME]>0;}}};
+ close:{t:LEM+' à moins de N points du premier',f:k=>{const d=SEC()[k];return !isReg(d)&&win(d)!==ME&&gap1(d)<TG.n;}},
+ lead:{t:LEM+' arrive premier',f:k=>{const d=SEC()[k];return !isReg(d)&&win(d)===ME;}},
+ fragile:{t:LEM+' premier, mais avec moins de 5 points d’avance',f:k=>{const d=SEC()[k];return !isReg(d)&&win(d)===ME&&pct(d,ME)-pct(d,second(d))<5;}},
+ strong:{t:LEM+' à '+CFG.strong+' % ou plus : faire sortir le vote',f:k=>{const d=SEC()[k];return !isReg(d)&&pct(d,ME)>=CFG.strong;}},
+ up:{t:LEM+' en hausse depuis '+(EVS.length?EVS[0][1]:'')+' (estimation)',only:CUR,f:k=>{const d=SEC()[k],e=E(k);return !isReg(d)&&!!e&&!!e[EV0]&&pct(d,ME)-e[EV0][ME]>0;}}};
 const tgLabel=()=>TG.k==='close'?LEM+' à moins de '+TG.n+' points du premier':TGT[TG.k].t;
 function qOk(k){const s=norm(FILT.q.trim());if(!s)return true;if(/^\d/.test(s))return String(lab(k)).startsWith(s);return norm(secOf(k)).includes(s)||norm((FEAT[YK][k]||{}).mun||'').includes(s);}
 function match(k){const d=R()[k];if(FILT.sec&&secOf(k)!==FILT.sec)return false;if(!qOk(k))return false;
@@ -67,8 +78,8 @@ const QUES={
  vs:{t:LEM+' face à un autre parti',s:'',pick:'vs',m:vsP},
  par:{t:'Le score de chaque parti',s:'Choisir un parti : son pourcentage dans chaque section',pick:'par',m:d=>pct(d,PP)},
  win:{t:'Qui est arrivé premier ?',s:'Le parti en tête dans chaque section'},
- part:{t:'Où vote-t-on le moins ?',s:'La participation le jour du scrutin',day:1},
- nv:{t:'Où sont les votes '+DUM+' ?',s:'Le nombre de votes '+DUM+' par section, jour du scrutin : où faire sortir le vote',only:CUR,day:1,m:d=>d[ME]||0},
+ part:{t:'Où vote-t-on le moins ?',s:'La participation, vote par anticipation compris',day:1},
+ nv:{t:'Où sont les votes '+DUM+' ?',s:'Le nombre de votes '+DUM+' par section, anticipation comprise : où faire sortir le vote',only:CUR,day:1,m:d=>d[ME]||0},
  pq:{t:'Le PQ le 5 octobre 2026',s:'Le score du Parti Québécois reporté sur les sections fédérales (estimation)',only:CUR,day:1},
  pqb:{t:'PQ fort, '+NM+' faible',s:'Écart entre le PQ (provincial 2026) et '+lem+' (fédéral 2025), section par section',only:CUR,day:1,
   bins:[[15,'#7fb2ff','PQ beaucoup plus fort','15 points et plus'],[5,'#3d6fb8','PQ plus fort','5 à 15 points'],[-5,'#4d5564','Semblables','moins de 5 points d’écart'],[-15,'#2c6f73','Bloc plus fort','5 à 15 points'],[-1e9,'#3fb6a0','Bloc beaucoup plus fort','15 points et plus']]},
@@ -79,8 +90,8 @@ const pqK=k=>{const v=DATA.pq26&&DATA.pq26[k];return v&&v[1]>=15?100*v[0]/v[1]:n
 const pqbK=k=>{const d=R()[k],q=pqK(k);return q==null||!d||isReg(d)||!tot(d)?null:q-pct(d,ME);};
 if(!DATA.pq26){delete QUES.pq;delete QUES.pqb;}
 if(!DATA.bq26)delete QUES.nv;
-if(DATA.bq26){const vs=Object.keys(DAY()).filter(k=>!isReg(DAY()[k])).map(k=>DAY()[k][ME]||0).sort((a,b)=>b-a),seuil=vs[Math.max(0,Math.ceil(vs.length/5)-1)]||0;
- TGT.gotv={t:'Le cinquième des sections avec le plus de votes '+DUM+' ('+seuil+' votes et plus) : faire sortir le vote',f:k=>{const d=DAY()[k];return !isReg(d)&&(d[ME]||0)>=seuil;}};}
+if(DATA.bq26){const vs=Object.keys(SEC()).filter(k=>!isReg(SEC()[k])).map(k=>Math.round(SEC()[k][ME]||0)).sort((a,b)=>b-a),seuil=vs[Math.max(0,Math.ceil(vs.length/5)-1)]||0;
+ TGT.gotv={t:'Le cinquième des sections avec le plus de votes '+DUM+' ('+seuil+' votes et plus) : faire sortir le vote',f:k=>{const d=SEC()[k];return !isReg(d)&&(d[ME]||0)>=seuil;}};}
 if(DATA.pq26)TGT.pqb={t:'PQ au moins 5 points devant '+lem+' (estimation) : électeurs à convaincre',only:CUR,f:k=>{const v=pqbK(k);return v!=null&&v>=5;}};
 const val=k=>{const d=R()[k];return Q==='pq'?pqK(k):Q==='pqb'?pqbK(k):Q==='prog'?prog(d,k):Q==='part'?partK(k):Q==='me'?pct(d,ME):QUES[Q].m(d)};
 function prepQ(){const D=R(),O=ORDall();
@@ -91,7 +102,7 @@ function prepQ(){const D=R(),O=ORDall();
  QUES.me.bins=quint(O.map(k=>pct(D[k],ME)),ramp(PC[ME]),x=>x+' %');
  QUES.par.bins=quint(O.map(k=>pct(D[k],PP)),ramp(PC[PP]),x=>x+' %');
  QUES.part.bins=quint(O.map(partK),ramp('#d9b44a'),x=>x+' %');
- if(QUES.nv)QUES.nv.bins=quint(O.map(k=>D[k][ME]||0),ramp(PC[ME]),x=>x+' votes');
+ if(QUES.nv)QUES.nv.bins=quint(O.map(k=>Math.round(D[k][ME]||0)),ramp(PC[ME]),x=>x+' votes');
  if(QUES.pq)QUES.pq.bins=quint(O.map(pqK),ramp('#4a8dff'),x=>x+' %');}
 function fillR(k){const d=R()[k];if(Q==='win'){const w=win(d),m=pct(d,w)-pct(d,second(d));return mix(PC[w],'#0b0d12',Math.max(0,Math.min(.6,(15-m)/15*.6)));}if(!QUES[Q].bins)return '#2a313c';const v=val(k);return v==null?'#2a313c':binOf(QUES[Q],v)[1];}
 function ZOP(){const z=typeof map!=='undefined'?map.getZoom():12;return z<=13?.85:z===14?.74:z===15?.6:.5;}
@@ -117,7 +128,7 @@ function renderRes(){const c=C(),r=c.res,y=YR[YK];
   $('cand').innerHTML=ps.filter(p=>v[p]/tv>=.004).map(p=>'<div class="cr'+(p===ME?' me':'')+'"><span class="nm">'+PL[p]+'</span><span class="pc">'+f1(100*v[p]/tv)+' %<small>≈ '+n0(v[p])+' votes</small></span><span class="tr"><i style="width:'+(100*v[p]/v[ps[0]])+'%;background:'+PC[p]+'"></i></span></div>').join('');
   const me=ps.indexOf(ME),d26=pct(DATA[CUR].res.cand.reduce((o,[p,,x])=>(o[p]=(o[p]||0)+x,o),{}),ME)-100*v[ME]/tv;
   $('kpis').innerHTML=[[ord(me+1),'Place estimée '+DUM+' en '+y.yr],[(d26>=0?'+':'')+f1(d26)+' pts','Variation '+DUM+' de '+y.yr+' à '+CURY],[r.origins.map(o=>o[0]).slice(0,2).join(', '),(r.origins.length>1?'Anciennes circonscriptions':'Ancienne circonscription')+' : '+r.origins.map(o=>o[0]+' ('+f1(o[1])+' %)').join(', ')]].map(x=>'<div class="kpi"><b'+(String(x[0]).length>14?' style="font-size:1.25rem;line-height:1.15"':'')+'>'+x[0]+'</b><span>'+x[1]+'</span></div>').join('');}
- const Dd=DAY(),O=Object.keys(Dd).filter(k=>!isReg(Dd[k])&&BYN[YK][k]),w={};O.forEach(k=>{const p=win(Dd[k]);w[p]=(w[p]||0)+1;});
+ const Dd=SEC(),O=Object.keys(Dd).filter(k=>!isReg(Dd[k])&&BYN[YK][k]),w={};O.forEach(k=>{const p=win(Dd[k]);w[p]=(w[p]||0)+1;});
  const ps=PO.filter(p=>w[p]).sort((a,b)=>w[b]-w[a]);
  $('stack').innerHTML=ps.map(p=>'<i style="width:'+(100*w[p]/O.length)+'%;background:'+PC[p]+'" title="'+PL[p]+' '+w[p]+'"></i>').join('');
  $('wl').innerHTML=PO.filter(p=>p!=='AUT').map(p=>'<span><i style="background:'+PC[p]+'"></i>'+AB[p]+' '+(w[p]||0)+'</span>').join('');}
@@ -187,7 +198,7 @@ function sentence(d,k){
  else{const s2=second(d);s+='Avance de '+f1(pct(d,ME)-pct(d,s2))+' points sur '+lc(LE[s2])+'. ';}
  return s;}
 function popup(p){const k=p.k,d=R()[k];
- const A=FILT.ty==='anti'?C().A[bvaOf(k)]:null,dd=DAY()[k];
+ const A=FILT.ty==='anti'?C().A[bvaOf(k)]:null,dd=SEC()[k];
  let h='<div class="pp"><h3>Section '+lab(k)+'</h3><div class="m">'+YR[YK].yr+' · '+(p.mun?p.mun+' · ':'')+n0(dd?insX(k)||dd.ins:0)+' électeurs inscrits'+(A?' · '+A.lab:'')+'</div>'+(A?'<div class="st">Vote par anticipation : résultats du '+A.lab+', qui regroupe les sections '+A.s.map(lab).join(', ')+'.</div>':'')+'<div class="big">'+sentence(d,k)+'</div>';
  if(!isReg(d)){PO.filter(x=>pct(d,x)>=1.5).sort((a,b)=>(d[b]||0)-(d[a]||0)).forEach(x=>{const v=pct(d,x);
   h+='<div class="pb'+(x===ME?' me':'')+'"><span class="nm">'+PL[x]+'</span><span class="tr"><i style="width:'+Math.min(100,v/70*100)+'%;background:'+PC[x]+'"></i></span><span class="pc">'+f1(v)+' %</span></div>';});
@@ -195,7 +206,7 @@ function popup(p){const k=p.k,d=R()[k];
   const pq=!A&&YK===CUR?pqK(k):null;
   if(DATA.lieux&&YK===CUR&&window.lieuxDe){const lv=lieuxDe(k),it=l=>' <a href="https://www.google.com/maps/dir/?api=1&destination='+l.lat.toFixed(5)+','+l.lng.toFixed(5)+'" target="_blank" rel="noopener">itinéraire</a>';
    if(lv.bvo||lv.bva)h+='<div class="lvsec">'+(lv.bvo?'<div><b>Vote le 7 décembre</b> : '+lv.bvo.nom+', '+lv.bvo.adr+(lv.bvo.lat!=null?' ·'+it(lv.bvo):'')+'</div>':'')+(lv.bva?'<div><b>Par anticipation (27 au 30 nov.)</b> : BVA '+lv.bva.no+', '+lv.bva.nom+(lv.bva.lat!=null?' ·'+it(lv.bva):'')+'</div>':'')+'</div>';}
-  h+='<div class="ft">'+n0(tot(d))+(A?' votes par anticipation dans ce bureau':' votes le jour du scrutin')+(DATA.bq26&&!A?', dont <b>'+n0(d[ME]||0)+' '+NM+'</b>':'')+'.'+ev+(pq!=null?' PQ le 5 octobre 2026 (estimation) : <b>'+f1(pq)+' %</b>.':'')+'</div>';}
+  h+='<div class="ft">'+n0(tot(d))+(A?' votes par anticipation dans ce bureau':FILT.ty==='jour'?' votes le jour du scrutin':' votes, anticipation et votes spéciaux répartis compris')+(DATA.bq26&&!A?', dont <b>'+n0(d[ME]||0)+' '+NM+'</b>':'')+'.'+ev+(pq!=null?' PQ le 5 octobre 2026 (estimation) : <b>'+f1(pq)+' %</b>.':'')+'</div>';}
  const cc=BYN[YK]&&BYN[YK][k]?BYN[YK][k].getBounds().getCenter():null;
  if(cc)h+='<div class="pact"><a href="https://www.google.com/maps/dir/?api=1&destination='+cc.lat.toFixed(5)+','+cc.lng.toFixed(5)+'" target="_blank" rel="noopener">Itinéraire</a><button onclick="shareSec(\''+k+'\')">Copier le lien</button></div>';
  return h+'</div>';}
@@ -315,8 +326,8 @@ function secRows(){const c=C(),D=DAY(),S={};const ini=code=>S[code]||(S[code]={c
   const e=YK===CUR?E(k):null;if(e&&e[EV0]){s.e0+=e[EV0][ME]*tot(D[k]);s.et+=tot(D[k]);}}
  for(const a in c.A){const A=c.A[a];for(const code in A.w){if(!S[code])continue;PO.forEach(p=>S[code].a[p]=(S[code].a[p]||0)+A.v[p]*A.w[code]);}}
  const rv=VP;return Object.values(S).filter(s=>s.n).map(s=>{const t={};PO.forEach(p=>t[p]=(s.j[p]||0)+(s.a[p]||0));const tt=tot(t),tj=tot(s.j),ta=tot(s.a);
-  return Object.assign(s,{t,tt,tj,ta,bj:100*(s.j[ME]||0)/(tj||1),ba:ta?100*(s.a[ME]||0)/ta:0,bt:100*t[ME]/(tt||1),rv:100*t[rv]/(tt||1),win:win(t),vn:100*(t[ME]-t[rv])/(tt||1),dv:s.et?100*(s.j[ME]||0)/tj-s.e0/s.et:null});});}
-function tgRows(){const D=DAY();return Object.keys(D).filter(k=>!isReg(D[k])&&BYN[YK][k]&&(!FILT.sec||secOf(k)===FILT.sec)&&TGT[TG.k].f(k)).map(k=>{const d=D[k],w=win(d),s2=second(d);return {k,lab:lab(k),sec:secOf(k),ins:insX(k)||d.ins,me:pct(d,ME),nv:d[ME]||0,pq:YK===CUR&&typeof pqK==='function'?pqK(k):null,win:w,gap:w===ME?pct(d,ME)-pct(d,s2):-gap1(d)};});}
+  return Object.assign(s,{t,tt,tj,ta,bj:100*(s.j[ME]||0)/(tj||1),ba:ta?100*(s.a[ME]||0)/ta:0,bt:100*t[ME]/(tt||1),rv:100*t[rv]/(tt||1),win:win(t),vn:100*(t[ME]-t[rv])/(tt||1),dv:s.et?100*t[ME]/(tt||1)-s.e0/s.et:null});});}
+function tgRows(){const D=SEC();return Object.keys(D).filter(k=>!isReg(D[k])&&BYN[YK][k]&&(!FILT.sec||secOf(k)===FILT.sec)&&TGT[TG.k].f(k)).map(k=>{const d=D[k],w=win(d),s2=second(d);return {k,lab:lab(k),sec:secOf(k),ins:insX(k)||d.ins,me:pct(d,ME),nv:Math.round(d[ME]||0),pq:YK===CUR&&typeof pqK==='function'?pqK(k):null,win:w,gap:w===ME?pct(d,ME)-pct(d,s2):-gap1(d)};});}
 function copyCSV(lines){const t=lines.map(r=>r.map(x=>{x=x==null?'':String(x);return /[",\n]/.test(x)?'"'+x.replace(/"/g,'""')+'"':x;}).join(',')).join('\n');
  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast('Tableau copié : collez-le dans un tableur.'),()=>toast('Copie impossible dans ce navigateur.'));}
 const th=(k,t,S,cls)=>'<th data-s="'+k+'" class="'+(cls||'')+(S.k===k?' s':'')+'">'+t+(S.k===k?(S.d<0?' ↓':' ↑'):'')+'</th>';
@@ -366,7 +377,7 @@ function renderTab(){const el=$('tab');
   el.innerHTML='<div class="ctrl"><span class="lab">Parti</span><div class="chips">'+PO.filter(p=>p!=='AUT').map(p=>'<button data-p="'+p+'" class="'+(p===RP?'on':'')+'" style="'+(p===RP?'background:'+PC[p]:'')+'">'+PL[p]+'</button>').join('')+'</div></div>'+
    '<div class="rank">'+rows.map((r,i)=>'<div class="rk" data-k="'+r.k+'"><span class="n">'+(i+1)+'</span><span>Section '+lab(r.k)+'<span class="tr"><i style="width:'+(100*r[RP]/(mx||1))+'%;background:'+PC[RP]+'"></i></span></span><span class="v">'+f1(r[RP])+' %</span></div>').join('')+'</div>';
   el.querySelectorAll('.chips button').forEach(b=>b.onclick=()=>{RP=b.dataset.p;renderTab();});}
- else{const Rr=DAY(),rows=Object.keys(Rr).filter(k=>!isReg(Rr[k])&&BYN[YK][k]&&E(k)&&E(k)[EV]&&dayMatch(k)).map(k=>{const d=Rr[k],e=E(k)[EV],w0=PO.reduce((a,p)=>e[p]>e[a]?p:a,ME);return {k,b0:e[ME],b1:pct(d,ME),dv:pct(d,ME)-e[ME],w0,w1:win(d)};});
+ else{const Rr=SEC(),rows=Object.keys(Rr).filter(k=>!isReg(Rr[k])&&BYN[YK][k]&&E(k)&&E(k)[EV]&&dayMatch(k)).map(k=>{const d=Rr[k],e=E(k)[EV],w0=PO.reduce((a,p)=>e[p]>e[a]?p:a,ME);return {k,b0:e[ME],b1:pct(d,ME),dv:pct(d,ME)-e[ME],w0,w1:win(d)};});
   rows.sort((a,b)=>(a.dv-b.dv)*ESORT);const up=rows.filter(r=>r.dv>0).length,ch=rows.filter(r=>r.w0!==r.w1).length;
   el.innerHTML='<div class="ctrl"><span class="lab">Comparer avec</span><div class="chips">'+EVS.map(([k,t])=>'<button data-e="'+k+'" class="'+(EV===k?'on':'')+'" style="'+(EV===k?'background:var(--bq)':'')+'">'+t+'</button>').join('')+'</div><span class="lab">'+rows.length+' sections · '+NM+' en hausse dans '+up+', en baisse dans '+(rows.length-up)+' · '+ch+' changements de parti en tête</span><button class="btn" id="es">'+(ESORT<0?'Plus fortes hausses d’abord':'Plus fortes baisses d’abord')+'</button></div>'+
    '<div class="tw"><table><thead><tr><th class="l">Section '+CURY+'</th><th>'+NM+' '+EVY()+' (est.)</th><th>'+NM+' '+CURY+'</th><th>Variation</th><th class="l">En tête '+EVY()+' → '+CURY+'</th></tr></thead><tbody>'+
@@ -386,9 +397,9 @@ function syncFUI(){const secs=[...new Set(Object.values(C().sec))].filter(x=>x).
  $('fty').value=FILT.ty;$('ftop').value=FILT.top;if(document.activeElement!==$('ftv'))$('ftv').value=FILT.tv;if(document.activeElement!==$('fq'))$('fq').value=FILT.q;$('fsd').textContent=SORT.d<0?'↓':'↑';
  $('lq').classList.toggle('on',!!FILT.q.trim());$('lty').classList.toggle('on',FILT.ty!=='all');$('lsec').classList.toggle('on',!!FILT.sec);$('llead').classList.toggle('on',!!FILT.lead);$('ltv').classList.toggle('on',tvNum()!=null);}
 function fsum(){const all=ORDall().length,n=ORD().length;let h;
- if(FILT.ty==='spec')h='Les votes spéciaux n’ont pas de territoire : ils sont dans le tableau des bureaux. La carte montre le jour du scrutin.';
+ if(FILT.ty==='spec')h='Les votes spéciaux n’ont pas de territoire : ils sont dans le tableau des bureaux. La carte montre tous les votes, répartis par section.';
  else h=fActive()?'<b>'+n+'</b> sections sur '+all+' correspondent':'<b>'+all+'</b> sections · aucun filtre';
- if(FILT.ty==='anti')h+=' · carte : vote par anticipation';
+ if(FILT.ty==='anti')h+=' · carte : vote par anticipation';else if(FILT.ty==='jour')h+=' · carte : jour du scrutin seulement';else h+=' · carte : tous les votes (anticipation et votes spéciaux répartis par section)';
  if(FILT.tg)h+='<span class="chip">À cibler : '+tgLabel()+'<button id="tgx" aria-label="Retirer">×</button></span>';
  $('fsum').innerHTML=h;const x=$('tgx');if(x)x.onclick=()=>{FILT.tg='';applyF();};}
 function applyF(){syncFUI();bvaLayer();prepQ();LAY[YK].setStyle(style);renderSide();renderTab();fsum();}
@@ -446,7 +457,7 @@ function gpsStart(){if(!navigator.geolocation){toast('La géolocalisation n’es
   else{GM.setLatLng(ll);GA.setLatLng(ll).setRadius(p.coords.accuracy);}
   const k=secAt(la,lo);
   if(k!==GK){GK=k;
-   if(k){const d=DAY()[k];HERE.innerHTML='<span>Vous êtes dans la <b>section '+lab(k)+'</b>'+(d&&!isReg(d)?' · '+NM+' '+f1(pct(d,ME))+' %':(d&&d.regr?' (comptée avec la section '+lab(d.regr)+')':''))+'</span><button class="btn" id="herego">Fiche</button>';
+   if(k){const d=SEC()[k];HERE.innerHTML='<span>Vous êtes dans la <b>section '+lab(k)+'</b>'+(d&&!isReg(d)?' · '+NM+' '+f1(pct(d,ME))+' %':(d&&d.regr?' (comptée avec la section '+lab(d.regr)+')':''))+'</span><button class="btn" id="herego">Fiche</button>';
     HERE.classList.add('on');$('herego').onclick=()=>BYN[CUR][k].openPopup(ll);}
    else{HERE.innerHTML='<span>Vous êtes hors des sections de cette circonscription.</span><button class="btn" id="herego">Arrêter</button>';HERE.classList.add('on');$('herego').onclick=gpsStop;}}
   if(GFIRST){GFIRST=false;map.setView(ll,Math.max(map.getZoom(),16));}
