@@ -88,3 +88,9 @@ Tests faits avec Playwright (Chromium préinstallé) sur un serveur local (`pyth
 - Journal : chaque tentative (page, résultat ok / refus / hors accès, identifiant, type d'appareil, taille d'écran ; jamais le code tapé ni l'adresse IP) est envoyée au script Apps Script `scripts/journal_apps_script.gs`, lié au Google Sheet « Atlas électoral : administration des accès » (onglets Journal et Personnes). Tant que l'URL du journal est vide, rien n'est envoyé.
 - Le journal reflète l'usage normal ; une personne avertie peut contourner la barrière JavaScript sans laisser de trace.
 - **État au 19 novembre 2026 : barrière désactivée.** Toutes les cartes sont libres, sans code. Pour la réactiver : dans `docs/assets/gate.js`, remplacer `var ACTIF=/*A*/false/*A*/` par `true`, changer le `?v=` de gate.js dans les pages, publier. Les codes de circonscription, le code universel et les codes personnels sont conservés et refonctionnent aussitôt.
+
+## Tableau de bord des consultations (20 novembre 2026)
+
+- Chaque ouverture d'une carte (provinciale, fédérale ou partielle) envoie une ligne anonyme au journal, une fois par onglet : page, date, type d'appareil, taille d'écran. Quand la barrière est active, les tentatives de code s'ajoutent (avec la personne pour un code personnel). Mention Loi 25 ajoutée au pied de chaque carte par `gate.js`.
+- Tableau de bord : `docs/admin/` (non indexé). Il demande le code universel ; la vérification se fait dans le script Google (sel et empreinte du code universel, absents du dépôt), avec un blocage d'une heure après 8 échecs. Tuiles, courbe des visites sur 30 jours, cartes les plus consultées, appareils, personnes, dernières activités.
+- Script : `scripts/journal_apps_script.gs` (remplacer `__SEL__` et `__EMPREINTE__` avant de le coller dans Apps Script). L'URL de l'application Web s'inscrit avec `scripts/personnes.py`, qui l'écrit dans `gate.js` et dans `docs/admin/index.html`.

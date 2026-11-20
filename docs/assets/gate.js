@@ -3,9 +3,18 @@
 (function(){
  try{localStorage.removeItem('aeq_acces');}catch(e){}
  /* Barrière désactivée le 19 novembre 2026 à la demande de Louis : remettre true pour exiger les codes. */
- var ACTIF=/*A*/false/*A*/;if(!ACTIF)return;
+ var ACTIF=/*A*/false/*A*/;
  var P=/*P*/[{"i":"p01","s":"3cf2bd7a41f9f0ff","h":"9a9a88b3d996c2cc3c35551fad51c43cfec80bed2fd67d2dea4c9db9ce2fdac8","a":[]},{"i":"p02","s":"65043fd266ac7268","h":"a0488a274814f668909588486753abd571ea7264456b81e4838c74b986892a0d","a":[]},{"i":"p03","s":"cf6a93ba3dd1f52e","h":"5eb7036d061ee6958f69ee73dc0f1b9d6a4c5772e697bf86ca2d05ffd13811ef","a":[]},{"i":"p04","s":"175a57b5abea79ea","h":"b58bb085d96b75b24cc3b6f0bff2bf04d61cc249f2f418fbe69768dcb34dcf29","a":[]},{"i":"p05","s":"d324523474a6cf39","h":"b8c5978c4a4e9dcee2452ffcd078134164504283132a23e4ad10ce79986b8897","a":[]},{"i":"p06","s":"8076ecb2166b84c6","h":"8cd13745def0e5f2774f7f213e221114e056757ed71baded946fc5ba76c5bcc0","a":[]},{"i":"p07","s":"53a1ca41827748ec","h":"462c94febc5db8db8730e64cc8c760ae3cdd52a8837546265bd7bd7729987d77","a":[]}]/*P*/,L=/*L*/""/*L*/;
- var G=window.AEQ_G,M={s:"541b0a8d451bfb9a",h:"488e0c6e53722074ff1008bee7060d47854951c1b66d2d34d7ca7bbf9044db3e"};if(!G)return;
+ var CLE=location.pathname.replace(/index\.html$/,'').replace(/\/+$/,'').split('/').slice(-2).join('/');
+ function permis(a){return (a||[]).some(function(m){return m==='*'||m===CLE||(m.slice(-2)==='/*'&&CLE.indexOf(m.slice(0,-1))===0);});}
+ function journal(res,qui){if(!L)return;try{var d=JSON.stringify({page:CLE,resultat:res,qui:qui,appareil:/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)?'téléphone':'ordinateur',ecran:screen.width+'x'+screen.height});
+  if(!(navigator.sendBeacon&&navigator.sendBeacon(L,d)))fetch(L,{method:'POST',body:d,mode:'no-cors',keepalive:true});}catch(e){}}
+ /* Chaque ouverture d'une carte est comptée (une fois par onglet), de façon anonyme tant qu'aucun code n'est entré. */
+ try{if(!sessionStorage.getItem('aeq_vu_'+CLE)){sessionStorage.setItem('aeq_vu_'+CLE,'1');journal('visite','');}}catch(e){journal('visite','');}
+ function mention(){var f=document.querySelector('footer');if(!f||document.getElementById('aeq-loi25'))return;var m=document.createElement('p');m.id='aeq-loi25';m.style.cssText='margin-top:8px;opacity:.75';
+  m.textContent='Les consultations de cette carte sont comptées de façon anonyme pour améliorer l’outil (circonscription, date, type d’appareil). Aucun renseignement personnel n’est recueilli.';f.appendChild(m);}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mention);else mention();
+ var G=window.AEQ_G,M={s:"541b0a8d451bfb9a",h:"488e0c6e53722074ff1008bee7060d47854951c1b66d2d34d7ca7bbf9044db3e"};if(!ACTIF||!G)return;
  document.documentElement.classList.add('gated');
  var css=document.createElement('style');
  css.textContent='html.gated body>*:not(#gate){display:none!important}html.gated body{overflow:hidden}'+
@@ -24,10 +33,6 @@
  '#gate a{color:#a9b0bd;font-size:.84rem}';
  document.head.appendChild(css);
  function sha(t){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)).then(function(b){return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0')}).join('')});}
- var CLE=location.pathname.replace(/index\.html$/,'').replace(/\/+$/,'').split('/').slice(-2).join('/');
- function permis(a){return (a||[]).some(function(m){return m==='*'||m===CLE||(m.slice(-2)==='/*'&&CLE.indexOf(m.slice(0,-1))===0);});}
- function journal(res,qui){if(!L)return;try{var d=JSON.stringify({page:CLE,resultat:res,qui:qui,appareil:/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)?'téléphone':'ordinateur',ecran:screen.width+'x'+screen.height});
-  if(!(navigator.sendBeacon&&navigator.sendBeacon(L,d)))fetch(L,{method:'POST',body:d,mode:'no-cors',keepalive:true});}catch(e){}}
  var essais=0;
  function show(){var g=document.createElement('div');g.id='gate';
   var nom=(document.title||'').split(' · ')[0];

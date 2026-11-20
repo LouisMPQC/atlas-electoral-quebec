@@ -4,6 +4,7 @@ Le fichier des personnes vit hors du dépôt (document « atlas-codes-acces » d
   {"p01": {"nom": "...", "code": "123456", "sel": "...", "acces": ["*" | "circonscription/*" | "federal/*" | "circonscription/levis", ...]}, ...}
 gate.js ne reçoit que l'identifiant (p01...), le sel, l'empreinte SHA-256 et la liste d'accès : ni nom ni code.
 Usage : python3 scripts/personnes.py PERSONNES.json docs [URL_DU_JOURNAL]
+L'URL du journal est écrite dans gate.js et dans le tableau de bord (docs/admin/index.html).
 """
 import sys, json, hashlib, re
 PERS, DOCS = sys.argv[1], sys.argv[2]
@@ -19,5 +20,8 @@ g = open(f, encoding='utf-8').read()
 g = re.sub(r'/\*P\*/.*?/\*P\*/', '/*P*/' + json.dumps(liste, separators=(',', ':')) + '/*P*/', g, flags=re.S)
 if URL is not None:
     g = re.sub(r'/\*L\*/.*?/\*L\*/', '/*L*/' + json.dumps(URL) + '/*L*/', g, flags=re.S)
+    a = f'{DOCS}/admin/index.html'  # le tableau de bord lit le même journal
+    h = open(a, encoding='utf-8').read()
+    open(a, 'w', encoding='utf-8').write(re.sub(r'/\*L\*/.*?/\*L\*/', '/*L*/' + json.dumps(URL) + '/*L*/', h, flags=re.S))
 open(f, 'w', encoding='utf-8').write(g)
 print('personnes', len(liste), '| journal', 'inchangé' if URL is None else (URL or 'désactivé'))
