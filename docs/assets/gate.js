@@ -25,6 +25,7 @@
  '#gate .lg{width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,#4a8dff,#7b5cf0);margin-bottom:16px;display:grid;place-items:center}'+
  '#gate .k{font:700 .7rem Inter,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#737b8a;margin-bottom:6px}'+
  '#gate h1{font:800 1.45rem/1.15 Inter,system-ui,sans-serif;letter-spacing:-.02em;margin:0 0 6px}'+
+ '#gate .rg{display:inline-flex;flex-wrap:wrap;gap:6px;margin:2px 0 12px}#gate .rg span{font:600 .78rem Inter,system-ui,sans-serif;color:#16181d;background:#f6d873;border-radius:999px;padding:3px 10px}'+
  '#gate p{color:#a9b0bd;font-size:.9rem;line-height:1.45;margin:0 0 18px}'+
  '#gate input{width:100%;box-sizing:border-box;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 14px;color:#f2f4f8;font:600 1.05rem Inter,system-ui,sans-serif;letter-spacing:.3em;text-align:center;font-size:1.4rem;outline:none}'+
  '#gate input::placeholder{letter-spacing:0;font-size:1rem;font-weight:500}'+
@@ -38,10 +39,16 @@
  function show(){var g=document.createElement('div');g.id='gate';
   var nom=(document.title||'').split(' · ')[0];
   g.innerHTML='<form autocomplete="off"><div class="lg"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>'+
-  '<div class="k">Accès réservé</div><h1></h1><p>La carte par section de vote de cette circonscription est réservée aux équipes de la région. Entrez le code d’accès qu’on vous a transmis. Il sera redemandé à chaque visite. Les accès sont journalisés pour la sécurité de l’outil.</p>'+
+  '<div class="k">Accès réservé</div><h1></h1><div class="rg"></div><p>La carte par section de vote de cette circonscription est réservée aux équipes de la région. Entrez le code d’accès qu’on vous a transmis. Il sera redemandé à chaque visite. Les accès sont journalisés pour la sécurité de l’outil.</p>'+
   '<input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Code d’accès" aria-label="Code d’accès" required><button type="submit">Entrer</button><div class="er" role="alert"></div>'+
   '<a href="../../">← Retour à l’accueil de l’atlas</a></form>';
   g.querySelector('h1').textContent=nom;
+  /* région(s) de la circonscription : le code de n'importe laquelle l'ouvre */
+  var NOMS={'01':'Bas-Saint-Laurent','02':'Saguenay–Lac-Saint-Jean','03':'Capitale-Nationale','04':'Mauricie','05':'Estrie','06':'Montréal','07':'Outaouais','08':'Abitibi-Témiscamingue','09':'Côte-Nord','10':'Nord-du-Québec','11':'Gaspésie–Îles-de-la-Madeleine','12':'Chaudière-Appalaches','13':'Laval','14':'Lanaudière','15':'Laurentides','16':'Montérégie','17':'Centre-du-Québec'};
+  var regs=GL.filter(function(x){return x.r&&NOMS[x.r];}).map(function(x){return NOMS[x.r];}),rg=g.querySelector('.rg');
+  if(regs.length){regs.forEach(function(n){var sp=document.createElement('span');sp.textContent='Région : '+n;rg.appendChild(sp);});
+   if(regs.length>1){var pp=g.querySelector('p');pp.textContent=pp.textContent.replace('aux équipes de la région.','aux équipes de ces '+regs.length+' régions : le code de n’importe laquelle l’ouvre.');}}
+  else rg.remove();
   document.body.appendChild(g);var f=g.querySelector('form'),i=g.querySelector('input'),er=g.querySelector('.er'),b=g.querySelector('button');i.focus();
   f.onsubmit=function(e){e.preventDefault();if(b.disabled)return;
    var v=i.value.replace(/\D/g,'');
