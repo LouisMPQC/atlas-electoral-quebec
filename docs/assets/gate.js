@@ -2,8 +2,8 @@
    le code est redemandé à chaque ouverture de la page. La page ne contient que l'empreinte SHA-256 du code. */
 (function(){
  try{localStorage.removeItem('aeq_acces');}catch(e){}
- /* Barrière désactivée le 19 novembre 2026 à la demande de Louis : remettre true pour exiger les codes. */
- var ACTIF=/*A*/false/*A*/;
+ /* Barrière : true = codes exigés (un code par région depuis le 20 novembre 2026), false = cartes libres. */
+ var ACTIF=/*A*/true/*A*/;
  var P=/*P*/[{"i":"p01","s":"3cf2bd7a41f9f0ff","h":"9a9a88b3d996c2cc3c35551fad51c43cfec80bed2fd67d2dea4c9db9ce2fdac8","a":[]},{"i":"p02","s":"65043fd266ac7268","h":"a0488a274814f668909588486753abd571ea7264456b81e4838c74b986892a0d","a":[]},{"i":"p03","s":"cf6a93ba3dd1f52e","h":"5eb7036d061ee6958f69ee73dc0f1b9d6a4c5772e697bf86ca2d05ffd13811ef","a":[]},{"i":"p04","s":"175a57b5abea79ea","h":"b58bb085d96b75b24cc3b6f0bff2bf04d61cc249f2f418fbe69768dcb34dcf29","a":[]},{"i":"p05","s":"d324523474a6cf39","h":"b8c5978c4a4e9dcee2452ffcd078134164504283132a23e4ad10ce79986b8897","a":[]},{"i":"p06","s":"8076ecb2166b84c6","h":"8cd13745def0e5f2774f7f213e221114e056757ed71baded946fc5ba76c5bcc0","a":[]},{"i":"p07","s":"53a1ca41827748ec","h":"462c94febc5db8db8730e64cc8c760ae3cdd52a8837546265bd7bd7729987d77","a":[]}]/*P*/,L=/*L*/"https://script.google.com/macros/s/AKfycbz-i18ugfGsO0xLnq67laDp9tOdgMURn_M-EiNfojZ8J1y_E6yKNMJheASfjblKMqcg/exec"/*L*/;
  var CLE=location.pathname.replace(/index\.html$/,'').replace(/\/+$/,'').split('/').slice(-2).join('/');
  function permis(a){return (a||[]).some(function(m){return m==='*'||m===CLE||(m.slice(-2)==='/*'&&CLE.indexOf(m.slice(0,-1))===0);});}
@@ -37,7 +37,7 @@
  function show(){var g=document.createElement('div');g.id='gate';
   var nom=(document.title||'').split(' · ')[0];
   g.innerHTML='<form autocomplete="off"><div class="lg"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>'+
-  '<div class="k">Accès réservé</div><h1></h1><p>La carte par section de vote de cette circonscription est réservée à son équipe. Entrez le code d’accès qu’on vous a transmis. Il sera redemandé à chaque visite. Les accès sont journalisés pour la sécurité de l’outil.</p>'+
+  '<div class="k">Accès réservé</div><h1></h1><p>La carte par section de vote de cette circonscription est réservée aux équipes de la région. Entrez le code d’accès qu’on vous a transmis. Il sera redemandé à chaque visite. Les accès sont journalisés pour la sécurité de l’outil.</p>'+
   '<input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Code d’accès" aria-label="Code d’accès" required><button type="submit">Entrer</button><div class="er" role="alert"></div>'+
   '<a href="../../">← Retour à l’accueil de l’atlas</a></form>';
   g.querySelector('h1').textContent=nom;
@@ -46,7 +46,7 @@
    var v=i.value.replace(/\D/g,'');
    Promise.all([sha(G.s+':'+v),sha(M.s+':'+v)].concat(P.map(function(x){return sha(x.s+':'+v);}))).then(function(r){
     var qui='',res='refus';
-    if(r[0]===G.h){qui='equipe';res='ok';}else if(r[1]===M.h){qui='universel';res='ok';}
+    if(r[0]===G.h){qui=G.r?'reg'+G.r:'equipe';res='ok';}else if(r[1]===M.h){qui='universel';res='ok';}
     else for(var n=0;n<P.length;n++)if(r[n+2]===P[n].h){qui=P[n].i;res=permis(P[n].a)?'ok':'hors';break;}
     journal(res,qui);
     if(res==='ok'){document.documentElement.classList.remove('gated');g.remove();window.dispatchEvent(new Event('aeq-unlock'));}

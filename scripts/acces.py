@@ -1,4 +1,4 @@
-"""Un code d'accès différent par circonscription.
+"""Codes d'accès des cartes : un par circonscription, ou un par région (champ « r » dans le fichier des codes).
 
 Les codes eux-mêmes ne sont jamais publiés : ils vivent dans un fichier hors du dépôt (premier argument).
 Chaque page reçoit seulement un sel aléatoire et l'empreinte SHA-256 de son code.
@@ -39,7 +39,8 @@ for p in pages:
         codes[key] = {'code': nouveau(), 'sel': secrets.token_hex(8)}; n_new += 1
     e = codes[key]
     h = hashlib.sha256((e['sel'] + ':' + e['code']).encode()).hexdigest()
-    html = html[:i] + f'<script>window.AEQ_G={{s:"{e["sel"]}",h:"{h}"}}</script>' + html[i:]
+    r = f',r:"{e["r"]}"' if e.get('r') else ''  # code par région : la région est notée au journal
+    html = html[:i] + f'<script>window.AEQ_G={{s:"{e["sel"]}",h:"{h}"{r}}}</script>' + html[i:]
     open(p, 'w', encoding='utf-8').write(html)
 json.dump(codes, open(CODES, 'w'), indent=1, ensure_ascii=False)
 print('pages', len(pages), 'nouveaux codes', n_new)
