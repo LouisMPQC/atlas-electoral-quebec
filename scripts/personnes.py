@@ -12,7 +12,8 @@ URL = sys.argv[3] if len(sys.argv) > 3 else None
 P = json.load(open(PERS, encoding='utf-8'))
 codes = [v['code'] for v in P.values()]
 assert len(codes) == len(set(codes)), 'deux personnes ont le même code'
-assert all(len(c) == 6 and c.isdigit() for c in codes), 'les codes personnels ont 6 chiffres'
+assert all(4 <= len(c) <= 6 and c.isdigit() for c in codes), 'les codes personnels ont de 4 à 6 chiffres'
+assert '2008' not in codes, 'code réservé (code universel)'
 liste = [{'i': k, 's': v['sel'], 'h': hashlib.sha256((v['sel'] + ':' + v['code']).encode()).hexdigest(), 'a': v.get('acces', [])}
          for k, v in sorted(P.items())]
 f = f'{DOCS}/assets/gate.js'
